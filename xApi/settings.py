@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'xApiAuthentication',
     'xApiProduct',
+    'xApiCart',
 ]
 
 REST_FRAMEWORK = {
