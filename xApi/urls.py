@@ -31,6 +31,7 @@ API_URL = 'api/v0/'
 
 urlpatterns = api_dcoumentaion_urls + [
     path(API_URL, include('xApiAuthentication.urls')),
+    path(API_URL, include('xApiProduct.urls')),
 ]
 
 
