@@ -26,7 +26,7 @@ api_dcoumentaion_urls = [
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 ]
 
-API_URL = 'api/v0/'
+API_URL = 'api/v1/'
 
 
 urlpatterns = api_dcoumentaion_urls + [

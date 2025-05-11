@@ -9,15 +9,13 @@ User = get_user_model()
 
 class SingUpSerializer(serializers.ModelSerializer):
     """ """
-
     confirm_password = serializers.CharField(write_only=True)
     password         = serializers.CharField(write_only=True, required=True)
     username         = serializers.CharField(required=True, max_length=150) 
-    phn_num          = serializers.CharField(required=True, max_length=15)
 
     class Meta:
         model       = User 
-        fields      = ['first_name', 'last_name', 'email', 'phn_num', 'username', 'password', 'confirm_password']
+        fields      = ['first_name', 'last_name', 'email', 'username', 'password', 'confirm_password']
 
     def validate(self, attrs):
         """ password validation """ 
@@ -33,11 +31,11 @@ class SingUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'username': 'Username already exists.'})
         return super().validate(attrs) 
     
-    def vaildate_phn_num(self, attrs):
-        """ phone number validation """
-        if User.objects.filter(phn_num=attrs['phn_num']).exists():
-            raise serializers.ValidationError({'phn_num': 'Phone number already exists.'})
-        return super().validate(attrs)  
+    # def vaildate_phn_num(self, attrs):
+    #     """ phone number validation """
+    #     if User.objects.filter(phn_num=attrs['phn_num']).exists():
+    #         raise serializers.ValidationError({'phn_num': 'Phone number already exists.'})
+    #     return super().validate(attrs)  
     
 
     def create(self, validated_data):

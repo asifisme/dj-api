@@ -23,6 +23,13 @@ class TimeStampModel(models.Model):
         abstract = True
 
 
+def product_categor_unique_key()-> str:
+    """
+    Generate a unique key for the product category.
+    """
+    return uuid.uuid4().hex[:32].lower()
+
+
 class ProductCategoryModel(TimeStampModel):
     """
     Model for product categories.
@@ -31,6 +38,7 @@ class ProductCategoryModel(TimeStampModel):
     slug       = models.SlugField(max_length=100, unique=True, null=True, blank=True)
     cate_desc  = models.TextField(null=True, blank=True)
     author     = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    cat_uid    = models.CharField(max_length=255, default=product_categor_unique_key, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.cate_name or "Unnamed Category"
@@ -47,16 +55,23 @@ class ProductCategoryModel(TimeStampModel):
         super().save(*args, **kwargs)
 
 
+def product_meta_tag_unique_key() -> str:
+    """
+    Generate a unique key for the product meta tag.
+    """
+    return uuid.uuid4().hex[:32].lower() 
+
 class ProductMetaTagModel(TimeStampModel):
     """
     Model for product meta tags.
     """
-    tag = models.CharField(max_length=100, unique=True, null=True, blank=True)
-    meta_title = models.CharField(max_length=255, null=True, blank=True)
-    meta_desc = models.TextField(null=True, blank=True)
-    meta_keywds = models.TextField(null=True, blank=True)
-    meta_robot = models.BooleanField(default=False)
-    author = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    tag             = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    meta_title      = models.CharField(max_length=255, null=True, blank=True)
+    meta_desc       = models.TextField(null=True, blank=True)
+    meta_keywds     = models.TextField(null=True, blank=True)
+    meta_robot      = models.BooleanField(default=False)
+    author          = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    meta_uid        = models.CharField(max_length=255, default=product_meta_tag_unique_key, null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.meta_keywds or 'No Keywords'} - {self.meta_title or 'No Title'}"
@@ -67,6 +82,12 @@ def product_unique_number() -> str:
     Generate a unique number for the product.
     """
     return str(uuid.uuid4().int % 10000000000000000000)
+
+def product_unique_key() -> str:
+    """
+    Generate a unique key for the product.
+    """
+    return uuid.uuid4().hex[:32].lower() 
 
 
 class ProductModel(TimeStampModel):
@@ -86,6 +107,7 @@ class ProductModel(TimeStampModel):
     available   = models.BooleanField(default=True)
     approve     = models.BooleanField(default=False)
     pro_uuid    = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    pro_uid     = models.CharField(max_length=255, default=product_unique_key, null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.name or 'Unnamed'} - {self.price or 'N/A'} - {self.stock or 'N/A'}"
@@ -161,6 +183,7 @@ class ProductImageModel(TimeStampModel):
     product     = models.ForeignKey(ProductModel, on_delete=models.CASCADE, null=True, blank=True, related_name="images")
     author      = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     image       = models.ImageField(upload_to=image_upload_to, null=True, blank=True)
+    img_uid     = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def __str__(self) -> str:
         return f"{self.product or 'No Product'} - Image"

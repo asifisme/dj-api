@@ -1,5 +1,6 @@
 import os 
 from datetime import timedelta 
+from decouple import config 
 
 from pathlib import Path
 
@@ -7,11 +8,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 
-SECRET_KEY = 'django-insecure-#5t0n=(car8wx)5d%d$(6+g%zjrlj4vyb=0u+*^y+qk&(sab5k'
+SECRET_KEY = config('SECRET_KEY') 
 
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 
 
@@ -28,6 +29,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
+    'corsheaders',
     'xApiAuthentication',
     'xApiProduct',
     'xApiCart',
@@ -61,7 +63,18 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  
+    "http://localhost:3000", 
+]
+
+CORS_ALLOW_CREDENTIALS = True 
+CSRF_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"  
 
 ROOT_URLCONF = 'xApi.urls'
 
