@@ -1,3 +1,4 @@
+import uuid 
 from django.db import models, transaction
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -16,62 +17,42 @@ class TimeStampModel(models.Model):
     class Meta:
         abstract = True
 
+def cart_unique_key() -> str:
+    """
+    Generate a unique key for the cart.
+    """
+    return uuid.uuid4().hex[:32].lower() 
 
 class CartModel(TimeStampModel):
     """
     Model representing a shopping cart.
     """
-    author = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name='carts',
-        help_text="The user who owns this cart."
-    )
+    author          = models.OneToOneField(User,on_delete=models.CASCADE,related_name='carts',help_text="The user who owns this cart.")
+    uid             = models.CharField(max_length=32, default=cart_unique_key, null=True, blank=True,
+        help_text="Unique identifier for the cart."
+    ) 
+
 
     def __str__(self) -> str:
         return f"Cart {self.id} by {self.author.username}"
 
 
+def cart_item_unique_key() -> str:
+    """
+    Generate a unique key for the cart item.
+    """
+    return uuid.uuid4().hex[:32].lower() 
+
 class CartItemModel(TimeStampModel):
     """
     Model representing an item in a shopping cart.
     """
-    cart_id = models.ForeignKey(
-        CartModel,
-        on_delete=models.CASCADE,
-        related_name='cart_items',
-        help_text="The cart this item belongs to."
-    )
-    product_id = models.ForeignKey(
-        ProductModel,
-        on_delete=models.CASCADE,
-        related_name='cart_items',
-        help_text="The product in this cart item."
-    )
-    cart_id = models.ForeignKey(
-        CartModel,
-        on_delete=models.CASCADE,
-        related_name='cart_items',
-        help_text="The cart this item belongs to."
-    )
-    
-    quantity = models.PositiveIntegerField(
-        default=1,
-        help_text="The quantity of the product in the cart."
-    )
-
-    price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="Snapshot price at time of adding to cart"
-    )
-
-    is_active = models.BooleanField(
-        default=True,
-        help_text="Indicates if the cart item is active."
-    )
+    cart_id         = models.ForeignKey(CartModel, on_delete=models.CASCADE, related_name='cart_items', help_text="The cart this item belongs to.")
+    product_id      = models.ForeignKey(ProductModel, on_delete=models.CASCADE, related_name='cart_items', help_text="The product in this cart item.")
+    quantity        = models.PositiveIntegerField(default=1, help_text="The quantity of the product in the cart.")
+    price           = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="Snapshot price at time of adding to cart")
+    is_active       = models.BooleanField(default=True, help_text="Indicates if the cart item is active.")
+    uid             = models.CharField(max_length=32, default=cart_item_unique_key, null=True, blank=True)
 
 
     def __str__(self) -> str:
@@ -92,6 +73,15 @@ class CartItemModel(TimeStampModel):
         """
         self.clean()
         super().save(*args, **kwargs)
+
+        
+
+
+def order_unique_key() -> str:
+    """
+    Generate a unique key for the order.
+    """
+    return uuid.uuid4().hex[:32].lower() 
 
 
 class OrderModel(TimeStampModel):
@@ -116,44 +106,23 @@ class OrderModel(TimeStampModel):
         ('cancelled', 'Cancelled'),
     )
 
-    author = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
-        related_name='orders',
-        help_text="The user who placed this order."
-    )
-    cart_id = models.ForeignKey(
-        CartModel,
-        on_delete=models.CASCADE,
-        related_name='orders',
-        help_text="The cart associated with this order."
-    )
-    order_note = models.TextField(
-        null=True,
-        blank=True,
-        help_text="Optional notes for the order."
-    )
-    ord_status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='pending',
-        help_text="The status of the order."
-    )
-    total_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
-    payment_status = models.CharField(max_length=20, choices=PAYMENT_STATUS, default='unpaid')
-    shipping_status = models.CharField(max_length=20, choices=SHIPPING_STATUS, default='pending')
-    is_confirmed = models.BooleanField(
-        default=False,
-        help_text="Indicates if the order is confirmed."
-    )
+    author              = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', help_text="The user who placed this order.")
+    cart_id             = models.ForeignKey(CartModel, on_delete=models.CASCADE, related_name='orders', help_text="The cart associated with this order.")
+    order_note          = models.TextField(null=True, blank=True, help_text="Optional notes for the order.")
+    ord_status          = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', help_text="The status of the order.")
+    total_amount        = models.DecimalField(max_digits=12, decimal_places=2, default=0.00)
+    payment_status      = models.CharField(max_length=20, choices=PAYMENT_STATUS, default='unpaid')
+    shipping_status     = models.CharField(max_length=20, choices=SHIPPING_STATUS, default='pending')
+    is_confirmed        = models.BooleanField(default=False, help_text="Indicates if the order is confirmed.")
+    uid                 = models.CharField(max_length=32, default=order_unique_key, null=True, blank=True)      
 
-    class Meta:
+    
+    def __str__(self) -> str:
+        return f"Order {self.id} by {self.author.username}"
+class Meta:
         indexes = [
             models.Index(fields=['author', 'ord_status']),
         ]
-
-    def __str__(self) -> str:
-        return f"Order {self.id} by {self.author.username}"
 
 
     # def save(self, *args, **kwargs) -> None:
@@ -189,31 +158,22 @@ class OrderModel(TimeStampModel):
     #         self.save()
 
 
+def order_item_unique_key() -> str:
+    """
+    Generate a unique key for the order item.
+    """
+    return uuid.uuid4().hex[:32].lower() 
+
 
 class OrderItemModel(TimeStampModel):
     """
     Model representing an item in an order.
     """
-    order_id = models.ForeignKey(
-        OrderModel,
-        on_delete=models.CASCADE,
-        related_name='order_items',
-        help_text="The order this item belongs to."
-    )
-
-    product_id = models.ForeignKey(ProductModel, on_delete=models.CASCADE, related_name='order_items')
-
-    quantity = models.PositiveIntegerField(
-        default=1,
-        help_text="The quantity of the product in the order."
-    )
-    price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text="The price of the product at the time of order."
-    )
+    order_id            = models.ForeignKey(OrderModel, on_delete=models.CASCADE, related_name='order_items', help_text="The order this item belongs to.")
+    product_id          = models.ForeignKey(ProductModel, on_delete=models.CASCADE, related_name='order_items')
+    quantity            = models.PositiveIntegerField(default=1, help_text="The quantity of the product in the order.")
+    price               = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, help_text="The price of the product at the time of order.")
+    uid                 = models.CharField(max_length=32, default=order_item_unique_key, null=True, blank=True) 
 
     class Meta:
         unique_together = ('order_id', 'product_id')
@@ -222,6 +182,9 @@ class OrderItemModel(TimeStampModel):
 
     def __str__(self) -> str:
         return f"Item {self.product_id.name} in Order {self.order_id.id}"
+    
+
+
 
     # def clean(self) -> None:
     #     """
