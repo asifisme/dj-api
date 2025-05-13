@@ -54,6 +54,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'title', 'desc', 'price', 'stock','slug', 'uid', 'images']  # '__all__'
         read_only_fields = ['id', 'created', 'modified', ] 
         #exclude = ['created', 'modified', 'unq_num',]
+        # 
 
 
 
