@@ -28,9 +28,7 @@ class CartModel(TimeStampModel):
     Model representing a shopping cart.
     """
     author          = models.OneToOneField(User,on_delete=models.CASCADE,related_name='carts',help_text="The user who owns this cart.")
-    uid             = models.CharField(max_length=32, default=cart_unique_key, null=True, blank=True,
-        help_text="Unique identifier for the cart."
-    ) 
+    uid             = models.CharField(max_length=32, default=cart_unique_key, null=True, blank=True,help_text="Unique identifier for the cart.") 
 
 
     def __str__(self) -> str:

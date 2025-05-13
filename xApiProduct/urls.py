@@ -5,14 +5,21 @@ from xApiProduct.views import ProductCategoryViewSet
 from xApiProduct.views import ProductMetaTagViewSet
 from xApiProduct.views import ProductViewSet
 from xApiProduct.views import ProductImageViewSet 
+from xApiProduct.views import TopSellingProductViewSet 
+from xApiProduct.views import NewArrivalProductViewSet 
 
 router = DefaultRouter() 
 
 router.register(r'product-category', ProductCategoryViewSet, basename='product-category')
 router.register(r'product-meta-tag', ProductMetaTagViewSet, basename='product-meta-tag')
-router.register(r'product', ProductViewSet, basename='product')
 router.register(r'product-image', ProductImageViewSet, basename='product-image')
 
+# product 
+router.register(r'product', ProductViewSet, basename='product')
+router.register(r'top-selling-product', TopSellingProductViewSet, basename='top-selling-product')
+#   ViewSet for new arrival products.
+router.register(r'new-arrival-product', NewArrivalProductViewSet, basename='new-arrival-product')
+ 
 urlpatterns = [
     path('', include(router.urls)),
 ]

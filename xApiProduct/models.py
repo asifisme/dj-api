@@ -38,7 +38,7 @@ class ProductCategoryModel(TimeStampModel):
     slug       = models.SlugField(max_length=100, unique=True, null=True, blank=True)
     cate_desc  = models.TextField(null=True, blank=True)
     author     = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
-    cat_uid    = models.CharField(max_length=255, default=product_categor_unique_key, null=True, blank=True)
+    uid    = models.CharField(max_length=255, default=product_categor_unique_key, null=True, blank=True)
 
     def __str__(self) -> str:
         return self.cate_name or "Unnamed Category"
@@ -71,7 +71,7 @@ class ProductMetaTagModel(TimeStampModel):
     meta_keywds     = models.TextField(null=True, blank=True)
     meta_robot      = models.BooleanField(default=False)
     author          = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
-    meta_uid        = models.CharField(max_length=255, default=product_meta_tag_unique_key, null=True, blank=True)
+    uid        = models.CharField(max_length=255, default=product_meta_tag_unique_key, null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.meta_keywds or 'No Keywords'} - {self.meta_title or 'No Title'}"
@@ -107,7 +107,7 @@ class ProductModel(TimeStampModel):
     available   = models.BooleanField(default=True)
     approve     = models.BooleanField(default=False)
     pro_uuid    = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    pro_uid     = models.CharField(max_length=255, default=product_unique_key, null=True, blank=True)
+    uid     = models.CharField(max_length=255, default=product_unique_key, null=True, blank=True)
 
     def __str__(self) -> str:
         return f"{self.name or 'Unnamed'} - {self.price or 'N/A'} - {self.stock or 'N/A'}"
@@ -183,7 +183,7 @@ class ProductImageModel(TimeStampModel):
     product     = models.ForeignKey(ProductModel, on_delete=models.CASCADE, null=True, blank=True, related_name="images")
     author      = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     image       = models.ImageField(upload_to=image_upload_to, null=True, blank=True)
-    img_uid     = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uid     = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def __str__(self) -> str:
         return f"{self.product or 'No Product'} - Image"
