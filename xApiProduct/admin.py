@@ -10,7 +10,7 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     """
     Admin interface for ProductCategoryModel
     """
-    list_display = ('cate_name', 'slug', 'author', 'created', 'modified')
+    list_display = ('id', 'cate_name', 'slug', 'author', 'created', 'modified')
     search_fields = ('cate_name', 'slug')
     prepopulated_fields = {'slug': ('cate_name',)}
     list_filter = ('author',)
@@ -21,7 +21,7 @@ class ProductMetaTagAdmin(admin.ModelAdmin):
     """
     Admin interface for ProductMetaTagModel
     """
-    list_display = ('tag', 'meta_title', 'meta_keywds', 'author', 'created', 'modified')
+    list_display = ('id','tag', 'meta_title', 'meta_keywds', 'author', 'created', 'modified')
     search_fields = ('tag', 'meta_title')
     list_filter = ('author',)
     ordering = ('-created',) 
@@ -31,7 +31,7 @@ class ProductAdmin(admin.ModelAdmin):
     """
     Admin interface for ProductModel
     """
-    list_display = ('name', 'title', 'slug', 'price', 'author', 'created', 'modified')
+    list_display = ('id','name', 'title', 'slug', 'price', 'author', 'created', 'modified')
     search_fields = ('name', 'title', 'slug')
     prepopulated_fields = {'slug': ('name',)}
     list_filter = ('author',)

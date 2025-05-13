@@ -16,6 +16,13 @@ def uload_to(instance, filename):
 
     return os.path.join(f'user_{instance.pk}', 'profile', filename)
 
+
+def user_unique_key() -> str:
+    """
+    Generate a unique key for the user.
+    """
+    return uuid.uuid4().hex[:32].lower() 
+
 class GenderChoices(models.TextChoices):
     MALE        = 'M', 'Male'
     FEMALE      = 'F', 'Female'
@@ -27,6 +34,7 @@ class CustomUser(AbstractUser, PermissionsMixin):
     gender          = models.CharField(max_length=10, choices=GenderChoices.choices, null=True, blank=True)
     dt_of_birth     = models.DateField(null=True, blank=True)
     pro_photo       = models.ImageField(upload_to=uload_to, null=True, blank=True)
+    uid             = models.CharField(max_length=32, default=user_unique_key, null=True, blank=True)
 
     objects         = CustomUserManager()
     

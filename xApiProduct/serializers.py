@@ -30,16 +30,8 @@ class ProductMetaTagSerializer(serializers.ModelSerializer):
 
 
 
-class ProductSerializer(serializers.ModelSerializer):
-    """
-    Serializer for products.
-    """
-    class Meta:
-        model = ProductModel
-        fields = '__all__'
-        read_only_fields = ['id', 'created', 'modified'] 
 
-
+# for only send data... 
 
 class ProductImageSerializer(serializers.ModelSerializer):
     """ 
@@ -48,5 +40,20 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductImageModel
-        fields = '__all__'
+        fields =  ['image'] #['id', 'image', 'author', 'created', 'modified']
         read_only_fields = ['id', 'created', 'modified']
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    """
+    Serializer for products.
+    """
+    images = ProductImageSerializer(many=True, read_only=True) 
+    class Meta:
+        model = ProductModel
+        fields = ['id', 'name', 'title', 'desc', 'price', 'stock','slug', 'uid', 'images']  # '__all__'
+        read_only_fields = ['id', 'created', 'modified', ] 
+        #exclude = ['created', 'modified', 'unq_num',]
+
+
+
