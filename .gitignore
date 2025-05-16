@@ -175,3 +175,13 @@ cython_debug/
 # local info tracking 
 media/ 
 # migrations/
+
+# .gitignore
+
+# Ignore frontend files
+*.html
+*.css
+*.js
+static/
+templates/
+assets/
