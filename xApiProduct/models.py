@@ -38,7 +38,7 @@ class ProductCategoryModel(TimeStampModel):
     slug       = models.SlugField(max_length=100, unique=True, null=True, blank=True)
     cate_desc  = models.TextField(null=True, blank=True)
     author     = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
-    uid    = models.CharField(max_length=255, default=product_categor_unique_key, null=True, blank=True)
+    uid        = models.CharField(max_length=255, default=product_categor_unique_key, unique=True)
 
     def __str__(self) -> str:
         return self.cate_name or "Unnamed Category"
@@ -54,6 +54,11 @@ class ProductCategoryModel(TimeStampModel):
             self.slug = slug
         super().save(*args, **kwargs)
 
+class ProductCategoryImageModel(TimeStampModel):
+    """ 
+    Model for product categories 
+    """
+    pass 
 
 def product_meta_tag_unique_key() -> str:
     """
@@ -71,7 +76,7 @@ class ProductMetaTagModel(TimeStampModel):
     meta_keywds     = models.TextField(null=True, blank=True)
     meta_robot      = models.BooleanField(default=False)
     author          = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
-    uid        = models.CharField(max_length=255, default=product_meta_tag_unique_key, null=True, blank=True)
+    uid             = models.CharField(max_length=255, default=product_meta_tag_unique_key, unique=True)
 
     def __str__(self) -> str:
         return f"{self.meta_keywds or 'No Keywords'} - {self.meta_title or 'No Title'}"
@@ -107,15 +112,12 @@ class ProductModel(TimeStampModel):
     available   = models.BooleanField(default=True)
     approve     = models.BooleanField(default=False)
     pro_uuid    = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    uid     = models.CharField(max_length=255, default=product_unique_key, null=True, blank=True)
+    uid         = models.CharField(max_length=255, default=product_unique_key,unique=True)
 
     def __str__(self) -> str:
         return f"{self.name or 'Unnamed'} - {self.price or 'N/A'} - {self.stock or 'N/A'}"
 
     def save(self, *args, **kwargs):
-        if not self.unq_num:
-            self.unq_num = product_unique_number()
-
         if self.title and not self.slug:
             base_slug  = slugify(self.title)
             slug       = base_slug
@@ -183,7 +185,7 @@ class ProductImageModel(TimeStampModel):
     product     = models.ForeignKey(ProductModel, on_delete=models.CASCADE, null=True, blank=True, related_name="images")
     author      = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     image       = models.ImageField(upload_to=image_upload_to, null=True, blank=True)
-    uid     = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uid         = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def __str__(self) -> str:
         return f"{self.product or 'No Product'} - Image"
@@ -238,3 +240,6 @@ class ProductImageModel(TimeStampModel):
                 )
 
         super().save(*args, **kwargs)
+
+
+

@@ -10,8 +10,8 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from django.contrib.auth import get_user_model  
 from django.contrib.auth import authenticate, login 
 
-from xApiAuthentication.serializers import SignInSerializer 
-from xApiAuthentication.serializers import SingUpSerializer
+from .serializers import SignInSerializer 
+from .serializers import SingUpSerializer
 
 
 
@@ -45,7 +45,6 @@ class SignInView(APIView):
         username_or_email = serializer.validated_data['username_or_email']
         password          = serializer.validated_data['password']
 
-        print(username_or_email, password)
 
 
         if not username_or_email or not password:
