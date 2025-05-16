@@ -174,7 +174,6 @@ cython_debug/
 .pypirc
 # local info tracking 
 media/ 
-<<<<<<< HEAD
 # migrations/
 =======
 # migrations/
@@ -188,4 +187,3 @@ media/
 static/
 templates/
 assets/
->>>>>>> dev
