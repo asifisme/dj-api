@@ -11,7 +11,7 @@ class CartModelAdmin(admin.ModelAdmin):
     """
     Admin interface for CartModel.
     """
-    list_display = ('id', 'author', 'created', 'modified')
+    list_display = ('author', 'created', 'modified')
     search_fields = ('author__username',)
     list_filter = ('created', 'modified')
     ordering = ('-created',) 
@@ -21,7 +21,7 @@ class CartItemModelAdmin(admin.ModelAdmin):
     """
     Admin interface for CartItemModel.
     """
-    list_display = ('id', 'cart_id', 'product_id', 'quantity', 'price', 'is_active')
+    list_display = ('cart_id', 'product_id', 'quantity', 'price', 'is_active')
     search_fields = ('cart_id__author__username', 'product_id__name')
     list_filter = ('is_active',)
     ordering = ('-created',) 

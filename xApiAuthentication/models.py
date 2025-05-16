@@ -28,13 +28,19 @@ class GenderChoices(models.TextChoices):
     FEMALE      = 'F', 'Female'
     OTHER       = 'C', 'Custom'
 
+class UserRole(models.TextChoices):
+    ADMINISTRATOR   = 'AD', 'Admin'
+
+
+
 class CustomUser(AbstractUser, PermissionsMixin):
     email           = models.EmailField(unique=True)
     phn_num         = models.CharField(max_length=15, null=True, blank=True)
     gender          = models.CharField(max_length=10, choices=GenderChoices.choices, null=True, blank=True)
     dt_of_birth     = models.DateField(null=True, blank=True)
     pro_photo       = models.ImageField(upload_to=uload_to, null=True, blank=True)
-    uid             = models.CharField(max_length=32, default=user_unique_key, null=True, blank=True)
+    uid             = models.CharField(max_length=32, default=user_unique_key, unique=True)
+
 
     objects         = CustomUserManager()
     

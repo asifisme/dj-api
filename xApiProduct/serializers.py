@@ -1,10 +1,10 @@
 from rest_framework import serializers 
 
 
-from xApiProduct.models import ProductCategoryModel 
-from xApiProduct.models import ProductMetaTagModel
-from xApiProduct.models import ProductModel
-from xApiProduct.models import ProductImageModel
+from .models import ProductCategoryModel 
+from .models import ProductMetaTagModel
+from .models import ProductModel
+from .models import ProductImageModel
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -15,6 +15,16 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         model = ProductCategoryModel
         fields = '__all__'
         read_only_fields = ['id', 'created', 'modified']
+
+    
+    def validate(self, attrs):
+        if not attrs.get('cate_name') or not str(attrs.get('cate_name').strip()):
+            raise serializers.ValidationError('Category is required')
+        # if not attrs.get('slug') or not str(attrs.get('slug').strip()):
+        #     raise serializers.ValidationError('Slug must required')
+        return super().validate(attrs)
+
+    
 
         
 

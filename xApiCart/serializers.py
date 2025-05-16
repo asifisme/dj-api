@@ -1,9 +1,12 @@
 from rest_framework import serializers 
+from django.shortcuts import get_object_or_404 
 
-from xApiCart.models import CartModel 
-from xApiCart.models import CartItemModel
-from xApiCart.models import OrderModel
-from xApiCart.models import OrderItemModel 
+from .models import CartModel 
+from .models import CartItemModel
+from .models import OrderModel
+from .models import OrderItemModel 
+
+from xApiProduct.models import ProductModel 
 
 
 class CartModelSerializer(serializers.ModelSerializer):
@@ -12,19 +15,51 @@ class CartModelSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = CartModel
-        fields = '__all__'
-        read_only_fields = ('id', 'created', 'modified') 
+        fields = [ 'id','author', 'uid', 'created', 'modified'] 
+        read_only_fields = ('id', 'author', 'uid', 'created', 'modified') 
+
 
 
 class CartItemModelSerializer(serializers.ModelSerializer):
     """
     Serializer for CartItemModel.
     """
+    author = serializers.StringRelatedField(source='cart_id.author', read_only=True)
+    product_uid = serializers.CharField(write_only=True )
+
     class Meta:
         model = CartItemModel
-        fields = '__all__'
-        read_only_fields = ('id', 'created', 'modified') 
+        fields = ['id', 'author', 'cart_id', 'product_uid', 'quantity', 'price', 'is_active', 'uid', 'created', 'modified']
+        read_only_fields = ('id', 'uid', 'price', 'created', 'modified') 
 
+    
+    def get_product(self, obj):
+        return {
+            "name" : obj.product_id.name, 
+            "uid" : obj.product_id.uid
+        }
+    
+    def create(self, validated_data):
+        product_uid = validated_data.pop('product_uid')
+        product = get_object_or_404(ProductModel, uid=product_uid)
+
+        quantity    =  validated_data.get('quantity', 1)
+
+        validated_data['product_id'] = product 
+        validated_data['price'] = product.price * quantity 
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        """ """
+        quantity = validated_data.get('quantity', instance.quantity)
+        product  = instance.product_id 
+
+        instance.quantity = quantity 
+        instance.price = product.price * quantity
+        instance.is_active = validated_data.get('is_active', instance.is_active)
+
+        instance.save()
+        return instance
 
 class OrderModelSerializer(serializers.ModelSerializer):
     """
@@ -32,7 +67,7 @@ class OrderModelSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = OrderModel
-        fields = '__all__'
+        fields = ['id', 'author', 'uid', 'order_num', 'status', , 'created', 'modified']
         read_only_fields = ('id', 'created', 'modified') 
 
 
@@ -42,5 +77,5 @@ class OrderItemModelSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = OrderItemModel
-        fields = '__all__'
-        read_only_fields = ('id', 'created', 'modified') 
+        fields = ['id', 'author', 'uid', 'status', 'total_price', 'created', 'modified']
+        read_only_fields = ('id', 'created', 'modified')
