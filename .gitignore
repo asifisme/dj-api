@@ -174,4 +174,18 @@ cython_debug/
 .pypirc
 # local info tracking 
 media/ 
+<<<<<<< HEAD
 # migrations/
+=======
+# migrations/
+
+# .gitignore
+
+# Ignore frontend files
+*.html
+*.css
+*.js
+static/
+templates/
+assets/
+>>>>>>> dev
