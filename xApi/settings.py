@@ -1,4 +1,5 @@
 import os 
+import stripe 
 from datetime import timedelta 
 from decouple import config 
 
@@ -14,7 +15,21 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
+# for payment gateway 
+# Stripe Keys from your Dashboard
+STRIPE_TEST_SECRET_KEY = config('STRIPE_TEST_PUBLISHABLE_KEY')  # config('STRIPE_TEST_SECRET_KEY')
+STRIPE_TEST_PUBLISHABLE_KEY = config('STRIPE_TEST_PUBLISHABLE_KEY')
 
+# Toggle between test/live
+STRIPE_LIVE_MODE = False  # Change to True in production
+
+# Use the correct keys depending on mode
+STRIPE_SECRET_KEY = STRIPE_TEST_SECRET_KEY
+STRIPE_PUBLISHABLE_KEY = STRIPE_TEST_PUBLISHABLE_KEY
+
+# Required by dj-stripe
+DJSTRIPE_SECRET_KEY = STRIPE_SECRET_KEY
+DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
 
 
 INSTALLED_APPS = [
@@ -30,10 +45,12 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
     'corsheaders',
+    'djstripe',
     'xApiAuthentication',
     'xApiProduct',
     'xApiCart',
     'xApiArticle',
+    'xApiPayment', 
 ]
 
 REST_FRAMEWORK = {

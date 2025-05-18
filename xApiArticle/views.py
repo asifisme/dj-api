@@ -1,7 +1,6 @@
 from rest_framework import viewsets 
-from rest_framework.permissions import IsAuthenticatedOrReadOnly 
-
-
+from rest_framework import permissions 
+from rest_framework.exceptions import ValidationError 
 
 from .models import ArticleCategoryModel 
 from .models import ArticleMetaTag 
@@ -16,43 +15,66 @@ from .serializers import ArticleImageSerializer
 
 
 
+
 class ArticleCategoryViewSet(viewsets.ModelViewSet): 
     """ ViewSet for Article Category """
     queryset = ArticleCategoryModel.objects.all()
     serializer_class = ArticleCategorySerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    lookup_field = 'uid'
-    
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    http_method_names = ['get', 'post', 'put', 'delete'] 
+    # lookup_field = 'uid'
+
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user) 
+        try:
+            serializer.save(author=self.request.user) 
+        except Exception as e:
+            raise ValidationError(f"Error creating Article Category: {str(e)}") 
 
 
 class ArticleMetaTagViewSet(viewsets.ModelViewSet): 
     """ ViewSet for Article Meta Tag """
     queryset = ArticleMetaTag.objects.all()
     serializer_class = ArticleMetaTagSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    lookup_field = 'uid'
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    http_method_names = ['get', 'post', 'put', 'delete'] 
+    # lookup_field = 'uid'
     
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user) 
+       try:
+            serializer.save(author=self.request.user)
+       except Exception as e:
+            raise ValidationError(f"Error creating Article Meta Tag: {str(e)}")
+
+
+
 
 class ArticleViewSet(viewsets.ModelViewSet):
     """ ViewSet for Article """
     queryset = ArticleModel.objects.all()
     serializer_class = ArticleSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
-    lookup_field = 'uid'
+    http_method_names = ['get', 'post', 'put', 'delete'] 
+    permission_classes = [permissions.AllowAny]
+    # lookup_field = 'uid'
     
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user) 
+       try:
+            serializer.save(author=self.request.user)
+       except Exception as e:
+            raise ValidationError(f"Error creating Article: {str(e)}")
+
+
+
 
 class ArticleImageViewSet(viewsets.ModelViewSet):
     """ ViewSet for Article Image """
     queryset = ArticleImageModel.objects.all()
     serializer_class = ArticleImageSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    http_method_names = ['get', 'post', 'put', 'delete'] 
+    permission_classes = [permissions.AllowAny]
     lookup_field = 'uid'
     
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user) 
+       try:
+            serializer.save(author=self.request.user)
+       except Exception as e:
+            raise ValidationError(f"Error creating Article Image: {str(e)}")

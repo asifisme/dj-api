@@ -4,11 +4,13 @@ import uuid
 from PIL import Image 
 from io import BytesIO 
 
+
 from django.db import models 
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.core.files.uploadedfile import InMemoryUploadedFile 
 
 from xApiAuthentication.managers import CustomUserManager
+
 
 def uload_to(instance, filename):
     ext         = filename.split('.')[-1]
@@ -23,14 +25,15 @@ def user_unique_key() -> str:
     """
     return uuid.uuid4().hex[:32].lower() 
 
+
 class GenderChoices(models.TextChoices):
     MALE        = 'M', 'Male'
     FEMALE      = 'F', 'Female'
     OTHER       = 'C', 'Custom'
 
+
 class UserRole(models.TextChoices):
     ADMINISTRATOR   = 'AD', 'Admin'
-
 
 
 class CustomUser(AbstractUser, PermissionsMixin):
@@ -46,6 +49,7 @@ class CustomUser(AbstractUser, PermissionsMixin):
     
     USERNAME_FIELD  = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'username',]
+
 
     def __str__(self):
         return f'{self.first_name} {self.last_name} - {self.email}'
@@ -75,6 +79,7 @@ class CustomUser(AbstractUser, PermissionsMixin):
 
         super().save(*args, **kwargs)  # ❗ This was missing!
 
+
     def make_thumbnail(self):
         try:
             self.pro_photo.seek(0)
@@ -98,6 +103,7 @@ class CustomUser(AbstractUser, PermissionsMixin):
 
             image_io.seek(0)
             return image_io
+        
 
         except Exception as e:
             print(f"Thumbnail Error: {e}")
