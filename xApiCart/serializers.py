@@ -68,11 +68,16 @@ class OrderModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderModel
 <<<<<<< HEAD
+<<<<<<< HEAD
         fields = ['id', 'author', 'uid', 'order_num', 'status', , 'created', 'modified']
 =======
         fields = ['id', 'author', 'uid', 'order_num', 'status',  'created', 'modified']
 >>>>>>> dev
         read_only_fields = ('id', 'created', 'modified') 
+=======
+        fields = "__all__" # ['id', 'author','cart_id', 'uid', 'order_num',  'created', 'modified']
+        read_only_fields = ('id','uid', 'order_num', 'created', 'modified') 
+>>>>>>> dev
 
 
 class OrderItemModelSerializer(serializers.ModelSerializer):
@@ -81,5 +86,5 @@ class OrderItemModelSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = OrderItemModel
-        fields = ['id', 'author', 'uid', 'status', 'total_price', 'created', 'modified']
-        read_only_fields = ('id', 'created', 'modified')
+        fields = ['id', 'uid', 'order_id', 'product_id', 'price', 'quantity', 'created', 'modified']
+        read_only_fields = ('id', 'uid', 'price', 'created', 'modified')

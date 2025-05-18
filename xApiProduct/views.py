@@ -16,7 +16,7 @@ from .serializers import ProductMetaTagSerializer
 from .serializers import ProductSerializer
 from .serializers import ProductImageSerializer 
 
-from common.pagepagination import StandardResultsSetPagination 
+from common.xpagepagination import DynamicPagination
 
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
@@ -25,9 +25,9 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = ProductCategoryModel.objects.all()
     serializer_class = ProductCategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post', 'put', 'delete']
-    pagination_class = StandardResultsSetPagination
+    pagination_class = DynamicPagination
 
 
 class ProductMetaTagViewSet(viewsets.ModelViewSet):
@@ -38,7 +38,7 @@ class ProductMetaTagViewSet(viewsets.ModelViewSet):
     serializer_class = ProductMetaTagSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post', 'put', 'delete']  
-    pagination_class = StandardResultsSetPagination 
+    pagination_class = DynamicPagination 
 
 class ProductViewSet(viewsets.ModelViewSet):
     """
@@ -50,7 +50,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'put', 'delete']  
     filter_backends  = [filters.SearchFilter]
     search_fields    = ['slug', 'title', 'name', 'desc', 'uid' ]
-    pagination_class = StandardResultsSetPagination 
+    pagination_class = DynamicPagination 
 
     def get_queryset(self):
         """Override to customize the queryset."""
@@ -88,4 +88,4 @@ class ProductImageViewSet(viewsets.ModelViewSet):
     serializer_class = ProductImageSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     http_method_names = ['get', 'post', 'put', 'delete'] 
-    pagination_class = StandardResultsSetPagination 
+    pagination_class = DynamicPagination 

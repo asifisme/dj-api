@@ -74,16 +74,16 @@ class CartItemModelViewSet(ModelViewSet):
     """
     ViewSet for CartItemModel.
     """
-    queryset = CartItemModel.objects.all()
-    serializer_class = CartItemModelSerializer
-    permission_classes = [permissions.AllowAny]
-    http_method_names = ['get', 'post', 'put', 'delete'] 
+    queryset                = CartItemModel.objects.all()
+    serializer_class        = CartItemModelSerializer
+    permission_classes      = [permissions.AllowAny]
+    http_method_names       = ['get', 'post', 'put', 'delete'] 
 
 
     def create(self, request, *args, **kwargs):
         user = self.request.user 
         product_uid = request.data.get('product_uid')
-        qunatity = int(request.data.get('quantity', 1))
+        quantity = int(request.data.get('quantity', 1))
 
         product = get_object_or_404(ProductModel, uid=product_uid)
 
@@ -92,36 +92,52 @@ class CartItemModelViewSet(ModelViewSet):
             cart_id = cart, 
             product_id = product, 
             defaults={
-                'quantity' : qunatity,
-                'price': product.price * qunatity, 
+                'quantity' : quantity,
+                'price': product.price * quantity, 
             }
         )
 
         if not created:
-           cart_item.quantity += qunatity
+           cart_item.quantity += quantity  # corrected variable name
            cart_item.price = product.price * cart_item.quantity  
            cart_item.save()
         serializer = self.get_serializer(cart_item)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     
+    def update(self, request, *args, **kwargs):
+        """ Update an existing cart item. """
+        cart_item = get_object_or_404(CartItemModel, pk=kwargs['pk'])
+        quantity = int(request.data.get('quantity', cart_item.quantity))
+        cart_item.quantity = quantity
+        cart_item.price = cart_item.product.price * quantity
+        cart_item.save()
+        serializer = self.get_serializer(cart_item)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class OrderModelViewSet(ModelViewSet):
     """
     ViewSet for OrderModel.
     """
-    queryset = OrderModel.objects.all()
-    serializer_class = OrderModelSerializer
-    permission_classes = [permissions.AllowAny]
-    http_method_names = ['get', 'post', 'put', 'delete'] 
+    queryset                = OrderModel.objects.all()
+    serializer_class        = OrderModelSerializer
+    permission_classes      = [permissions.IsAuthenticated]
+    http_method_names       = ['get', 'post', 'put', 'delete'] 
+
+    def update(self, request, *args, **kwargs):
+        raise MethodNotAllowed(
+            'PUT', 
+            detail="Update operation is not allowed for OrderModelViewSet.",
+            code=status.HTTP_405_METHOD_NOT_ALLOWED
+        )
 
 
 class OrderItemModelViewSet(ModelViewSet):
     """
     ViewSet for OrderItemModel.
     """
-    queryset = OrderItemModel.objects.all()
-    serializer_class = OrderItemModelSerializer
-    permission_classes = [permissions.AllowAny]
-    http_method_names = ['get', 'post', 'put', 'delete']
+    queryset            = OrderItemModel.objects.all()
+    serializer_class    = OrderItemModelSerializer
+    permission_classes  = [permissions.IsAuthenticated]
+    http_method_names   = ['get', 'post', 'put', 'delete']

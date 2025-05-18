@@ -14,10 +14,10 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-
 class TimeStampModel(models.Model):
     created     = models.DateTimeField(auto_now_add=True)
     modified   = models.DateTimeField(auto_now=True)
+
 
     class Meta:
         abstract = True 
@@ -30,7 +30,6 @@ def generate_unique_uid():
     return uuid.uuid4().hex[:32].lower()
     
 
-
 class ArticleCategoryModel(TimeStampModel):
     """ Model for Article category """
     cate_name       = models.CharField(max_length=512, unique=True)
@@ -42,6 +41,8 @@ class ArticleCategoryModel(TimeStampModel):
     def __str__(self):
         return f'{self.cate_name}-written-by-{self.author.email if self.author else "unknown"}'
     
+
+
 
 class ArticleMetaTag(TimeStampModel):
     """ 
@@ -88,8 +89,11 @@ class ArticleModel(TimeStampModel):
             self.slug = slugify(self.title) 
         super().save(*args, **kwargs)
 
+
     def __str__(self)-> str:
         return f'{self.title}'
+    
+
 
 
 def article_image_path(instance, filename):
@@ -97,7 +101,6 @@ def article_image_path(instance, filename):
     filename = f'{uuid.uuid4().hex}.{ext}'
     article_slug = slugify(instance.article.slug if instance.article and instance.article.slug else 'unknown')
     return os.path.join('article', article_slug, 'images', filename)
-
 
 
 class ArticleImageModel(TimeStampModel):

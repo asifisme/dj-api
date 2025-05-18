@@ -1,5 +1,6 @@
 from rest_framework import serializers 
 
+
 from .models import ArticleCategoryModel 
 from .models import ArticleMetaTag 
 from .models import ArticleModel 
@@ -13,9 +14,11 @@ class ArticleCategorySerializer(serializers.ModelSerializer):
         model = ArticleCategoryModel
         fields = '__all__'
         read_only_fields = ('uid', 'created', 'modified')
-        extra_kwargs = {
-            'author': {'required': False, 'allow_null': True}
-        } 
+        # extra_kwargs = {
+        #     'author': {'required': False, 'allow_null': True}
+        # } 
+
+
 
 
 class ArticleMetaTagSerializer(serializers.ModelSerializer):
@@ -25,9 +28,12 @@ class ArticleMetaTagSerializer(serializers.ModelSerializer):
         model = ArticleMetaTag
         fields = '__all__'
         read_only_fields = ('uid', 'created', 'modified')
-        extra_kwargs = {
-            'author': {'required': False, 'allow_null': True}
-        } 
+        # extra_kwargs = {
+        #     'author': {'required': False, 'allow_null': True}
+        # } 
+
+
+
 
 class ArticleSerializer(serializers.ModelSerializer):
     """ Serializer for Article Model """
@@ -36,10 +42,13 @@ class ArticleSerializer(serializers.ModelSerializer):
         model = ArticleModel
         fields = '__all__'
         read_only_fields = ('uid', 'created', 'modified')
-        extra_kwargs = {
-            'author': {'required': False, 'allow_null': True},
-            'cate_id': {'required': False, 'allow_null': True}
-        } 
+        # extra_kwargs = {
+        #     'author': {'required': False, 'allow_null': True},
+        #     'cate_id': {'required': False, 'allow_null': True}
+        # } 
+
+
+
 
 class ArticleImageSerializer(serializers.ModelSerializer):
     """ Serializer for Article Image Model """
@@ -48,7 +57,7 @@ class ArticleImageSerializer(serializers.ModelSerializer):
         model = ArticleImageModel
         fields = '__all__'
         read_only_fields = ('uid', 'created', 'modified')
-        extra_kwargs = {
-            'author': {'required': False, 'allow_null': True},
-            'article': {'required': False, 'allow_null': True}
-        } 
+        # extra_kwargs = {
+        #     'author': {'required': False, 'allow_null': True},
+        #     'article': {'required': False, 'allow_null': True}
+        # } 

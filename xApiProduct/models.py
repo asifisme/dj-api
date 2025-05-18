@@ -9,18 +9,20 @@ from django.utils.text import slugify
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.exceptions import ValidationError
 
+from common.xtimestamp import TimeStampModel 
+
 User = get_user_model()
 
 
-class TimeStampModel(models.Model):
-    """
-    Abstract base class that provides self-updating 'created' and 'modified' fields.
-    """
-    created     = models.DateTimeField(auto_now_add=True)
-    modified    = models.DateTimeField(auto_now=True)
+# class TimeStampModel(models.Model):
+#     """
+#     Abstract base class that provides self-updating 'created' and 'modified' fields.
+#     """
+#     created     = models.DateTimeField(auto_now_add=True)
+#     modified    = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        abstract = True
+#     class Meta:
+#         abstract = True
 
 
 def product_categor_unique_key()-> str:
@@ -40,8 +42,10 @@ class ProductCategoryModel(TimeStampModel):
     author     = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     uid        = models.CharField(max_length=255, default=product_categor_unique_key, unique=True)
 
+
     def __str__(self) -> str:
         return self.cate_name or "Unnamed Category"
+    
 
     def save(self, *args, **kwargs):
         if self.cate_name and not self.slug:
@@ -54,17 +58,24 @@ class ProductCategoryModel(TimeStampModel):
             self.slug = slug
         super().save(*args, **kwargs)
 
+
+
+
 class ProductCategoryImageModel(TimeStampModel):
     """ 
     Model for product categories 
     """
     pass 
 
+
+
+
 def product_meta_tag_unique_key() -> str:
     """
     Generate a unique key for the product meta tag.
     """
     return uuid.uuid4().hex[:32].lower() 
+
 
 class ProductMetaTagModel(TimeStampModel):
     """
@@ -82,11 +93,14 @@ class ProductMetaTagModel(TimeStampModel):
         return f"{self.meta_keywds or 'No Keywords'} - {self.meta_title or 'No Title'}"
 
 
+
+
 def product_unique_number() -> str:
     """
     Generate a unique number for the product.
     """
     return str(uuid.uuid4().int % 10000000000000000000)
+
 
 def product_unique_key() -> str:
     """
@@ -114,8 +128,10 @@ class ProductModel(TimeStampModel):
     pro_uuid    = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     uid         = models.CharField(max_length=255, default=product_unique_key,unique=True)
 
+
     def __str__(self) -> str:
         return f"{self.name or 'Unnamed'} - {self.price or 'N/A'} - {self.stock or 'N/A'}"
+    
 
     def save(self, *args, **kwargs):
         if self.title and not self.slug:
@@ -130,12 +146,14 @@ class ProductModel(TimeStampModel):
 
         super().save(*args, **kwargs)
 
+
     def update_stock(self, quantity: int) -> None:
         """Update the stock of the product."""
         if self.stock is None:
             raise ValueError("Stock cannot be None.")
         self.stock += quantity
         self.save()
+
 
     def reduce_stock(self, quantity: int) -> None:
         """Reduce the stock of the product."""
@@ -146,6 +164,7 @@ class ProductModel(TimeStampModel):
             self.save()
         else:
             raise ValueError("Insufficient stock to reduce.")
+        
 
     def restock(self, quantity: int) -> None:
         """Restock the product by a certain quantity."""
@@ -156,13 +175,16 @@ class ProductModel(TimeStampModel):
         self.stock += quantity
         self.save()
 
+
     def is_available(self) -> bool:
         """Check if the product is available."""
         return self.available and (self.stock is not None and self.stock > 0)
+    
 
-    def get_price(self):
+    def get_price(self) -> float:
         """Get the price of the product."""
-        return self.price
+        return float(self.price)
+    
 
     def is_approved(self) -> bool:
         """Check if the product is approved."""
@@ -178,6 +200,8 @@ def image_upload_to(instance, filename: str) -> str:
     return os.path.join(f"product_{instance.product.pk}", "images", filename)
 
 
+
+
 class ProductImageModel(TimeStampModel):
     """
     Model for product images.
@@ -187,8 +211,10 @@ class ProductImageModel(TimeStampModel):
     image       = models.ImageField(upload_to=image_upload_to, null=True, blank=True)
     uid         = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
+
     def __str__(self) -> str:
         return f"{self.product or 'No Product'} - Image"
+    
 
     def make_thumbnail(self):
         """
@@ -216,6 +242,7 @@ class ProductImageModel(TimeStampModel):
 
         except Exception as e:
             raise ValidationError(f"Thumbnail Error: {e}")
+        
 
     def save(self, *args, **kwargs):
         """Override the save method to perform custom actions."""
