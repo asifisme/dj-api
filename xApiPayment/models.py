@@ -15,6 +15,8 @@ class PaymentModel(TimeStampModel):
     """
     order                  = models.OneToOneField(OrderModel, on_delete=models.CASCADE, related_name='payment') 
     user                   = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments') 
+    name_of_payer          = models.CharField(max_length=255, null=True, blank=True)
+    email_of_payer         = models.EmailField(null=True, blank=True)
     amount_paid            = models.IntegerField(null=True, blank=True)
     currency               = models.CharField(max_length=10, default="usd")
     stripe_checkout_id     = models.CharField(max_length=255, unique=True, null=True, blank=True) 
