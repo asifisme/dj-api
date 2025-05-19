@@ -14,17 +14,6 @@ from common.xtimestamp import TimeStampModel
 User = get_user_model()
 
 
-# class TimeStampModel(models.Model):
-#     """
-#     Abstract base class that provides self-updating 'created' and 'modified' fields.
-#     """
-#     created     = models.DateTimeField(auto_now_add=True)
-#     modified    = models.DateTimeField(auto_now=True)
-
-#     class Meta:
-#         abstract = True
-
-
 def product_categor_unique_key()-> str:
     """
     Generate a unique key for the product category.

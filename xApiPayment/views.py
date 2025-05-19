@@ -8,6 +8,7 @@ from rest_framework import viewsets
 from rest_framework import  views 
 from rest_framework import  status 
 from rest_framework import  permissions
+from rest_framework import  throttling 
 
 
 from django.contrib.auth import get_user_model
@@ -29,10 +30,11 @@ logger = logging.getLogger(__name__)
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = PaymentModel.objects.all()
-    serializer_class = PaymentSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get', 'post']
+    queryset                = PaymentModel.objects.all()
+    serializer_class        = PaymentSerializer
+    permission_classes      = [permissions.IsAuthenticated]
+    http_method_names       = ['get', 'post']
+    throttle_classes        = [throttling.UserRateThrottle]
 
 
     @action(detail=False, methods=['post'], url_path='create-checkout-session')

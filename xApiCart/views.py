@@ -3,6 +3,7 @@ from rest_framework import permissions
 from rest_framework.response import Response 
 from rest_framework import status 
 from rest_framework.exceptions import MethodNotAllowed 
+from rest_framework import throttling 
 from django.shortcuts import get_object_or_404 
 
 
@@ -24,10 +25,12 @@ class CartModelViewSet(ModelViewSet):
     """
     ViewSet for CartModel.
     """
-    queryset = CartModel.objects.all()
-    serializer_class = CartModelSerializer
-    permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get', 'post', 'delete'] 
+    queryset                = CartModel.objects.all()
+    serializer_class        = CartModelSerializer
+    permission_classes      = [permissions.IsAuthenticated]
+    http_method_names       = ['get', 'post', 'delete'] 
+    throttle_classes        = [throttling.UserRateThrottle]
+
 
     def create(self, request, *args, **kwargs):
         """ Create a new cart for the user if it doesn't exist."""
@@ -51,12 +54,16 @@ class CartModelViewSet(ModelViewSet):
         serializer.save(author=user)
         return Response(serializer.data, status=201)
     
+
+
     def update(self, request, *args, **kwargs):
         raise MethodNotAllowed(
             'PUT', 
             detail="Update operation is not allowed for CartItemModelViewSet.",
             code=status.HTTP_405_METHOD_NOT_ALLOWED
         )
+    
+
     
     # not allowing update operation for cart items as per the original code logic 
     def retrieve(self, request, *args, **kwargs):
@@ -70,6 +77,8 @@ class CartModelViewSet(ModelViewSet):
 
   
 
+
+
 class CartItemModelViewSet(ModelViewSet):
     """
     ViewSet for CartItemModel.
@@ -78,6 +87,7 @@ class CartItemModelViewSet(ModelViewSet):
     serializer_class        = CartItemModelSerializer
     permission_classes      = [permissions.AllowAny]
     http_method_names       = ['get', 'post', 'put', 'delete'] 
+    throttle_classes        = [throttling.UserRateThrottle]
 
 
     def create(self, request, *args, **kwargs):
@@ -116,6 +126,9 @@ class CartItemModelViewSet(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+
+
+
 class OrderModelViewSet(ModelViewSet):
     """
     ViewSet for OrderModel.
@@ -124,6 +137,8 @@ class OrderModelViewSet(ModelViewSet):
     serializer_class        = OrderModelSerializer
     permission_classes      = [permissions.IsAuthenticated]
     http_method_names       = ['get', 'post', 'put', 'delete'] 
+    throttle_classes        = [throttling.UserRateThrottle]
+
 
     def update(self, request, *args, **kwargs):
         raise MethodNotAllowed(
@@ -131,6 +146,9 @@ class OrderModelViewSet(ModelViewSet):
             detail="Update operation is not allowed for OrderModelViewSet.",
             code=status.HTTP_405_METHOD_NOT_ALLOWED
         )
+
+
+
 
 
 class OrderItemModelViewSet(ModelViewSet):
@@ -141,3 +159,4 @@ class OrderItemModelViewSet(ModelViewSet):
     serializer_class    = OrderItemModelSerializer
     permission_classes  = [permissions.IsAuthenticated]
     http_method_names   = ['get', 'post', 'put', 'delete']
+    throttle_classes    = [throttling.UserRateThrottle]
