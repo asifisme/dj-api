@@ -1,6 +1,7 @@
 from rest_framework import viewsets 
 from rest_framework import permissions 
 from rest_framework.exceptions import ValidationError 
+from rest_framework import throttling 
 
 from .models import ArticleCategoryModel 
 from .models import ArticleMetaTag 
@@ -18,10 +19,11 @@ from .serializers import ArticleImageSerializer
 
 class ArticleCategoryViewSet(viewsets.ModelViewSet): 
     """ ViewSet for Article Category """
-    queryset = ArticleCategoryModel.objects.all()
-    serializer_class = ArticleCategorySerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    http_method_names = ['get', 'post', 'put', 'delete'] 
+    queryset                  = ArticleCategoryModel.objects.all()
+    serializer_class          = ArticleCategorySerializer
+    permission_classes        = [permissions.IsAuthenticatedOrReadOnly]
+    http_method_names         = ['get', 'post', 'put', 'delete'] 
+    throttle_classes          = [throttling.UserRateThrottle]
     # lookup_field = 'uid'
 
     def perform_create(self, serializer):
@@ -31,12 +33,15 @@ class ArticleCategoryViewSet(viewsets.ModelViewSet):
             raise ValidationError(f"Error creating Article Category: {str(e)}") 
 
 
+
+
 class ArticleMetaTagViewSet(viewsets.ModelViewSet): 
     """ ViewSet for Article Meta Tag """
-    queryset = ArticleMetaTag.objects.all()
-    serializer_class = ArticleMetaTagSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    http_method_names = ['get', 'post', 'put', 'delete'] 
+    queryset                  = ArticleMetaTag.objects.all()
+    serializer_class          = ArticleMetaTagSerializer
+    permission_classes        = [permissions.IsAuthenticatedOrReadOnly]
+    http_method_names         = ['get', 'post', 'put', 'delete'] 
+    throttle_classes          = [throttling.UserRateThrottle]
     # lookup_field = 'uid'
     
     def perform_create(self, serializer):
@@ -50,10 +55,11 @@ class ArticleMetaTagViewSet(viewsets.ModelViewSet):
 
 class ArticleViewSet(viewsets.ModelViewSet):
     """ ViewSet for Article """
-    queryset = ArticleModel.objects.all()
-    serializer_class = ArticleSerializer
-    http_method_names = ['get', 'post', 'put', 'delete'] 
-    permission_classes = [permissions.AllowAny]
+    queryset                  = ArticleModel.objects.all()
+    serializer_class          = ArticleSerializer
+    http_method_names         = ['get', 'post', 'put', 'delete'] 
+    permission_classes        = [permissions.AllowAny]
+    throttle_classes          = [throttling.UserRateThrottle]
     # lookup_field = 'uid'
     
     def perform_create(self, serializer):
@@ -67,11 +73,12 @@ class ArticleViewSet(viewsets.ModelViewSet):
 
 class ArticleImageViewSet(viewsets.ModelViewSet):
     """ ViewSet for Article Image """
-    queryset = ArticleImageModel.objects.all()
-    serializer_class = ArticleImageSerializer
-    http_method_names = ['get', 'post', 'put', 'delete'] 
-    permission_classes = [permissions.AllowAny]
-    lookup_field = 'uid'
+    queryset                  = ArticleImageModel.objects.all()
+    serializer_class          = ArticleImageSerializer
+    http_method_names         = ['get', 'post', 'put', 'delete'] 
+    permission_classes        = [permissions.AllowAny]
+    parser_classes            = [throttling.UserRateThrottle]
+#     lookup_field = 'uid'
     
     def perform_create(self, serializer):
        try:
