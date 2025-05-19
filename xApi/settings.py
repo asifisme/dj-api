@@ -13,7 +13,8 @@ SECRET_KEY = config('SECRET_KEY')
 
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+# ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0' ]  # Add '0.0.0.0'
+ALLOWED_HOSTS =  config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 # for payment gateway 
 
@@ -90,8 +91,9 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  
+    "http://localhost:5173",   
     "http://localhost:3000", 
+    "http://0.0.0.0:8080", 
 ]
 
 CORS_ALLOW_CREDENTIALS = True 
