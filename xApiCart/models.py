@@ -9,21 +9,9 @@ from common.xtimestamp import TimeStampModel
 User = get_user_model()
 
 
-# class TimeStampModel(models.Model):
-#     """
-#     Abstract model providing created and modified timestamps.
-#     """
-#     created = models.DateTimeField(auto_now_add=True)
-#     modified = models.DateTimeField(auto_now=True)
-
-#     class Meta:
-#         abstract = True
-
-
-
 def cart_unique_key() -> str:
     """
-    Generate a unique key for the cart.
+    Generate a unique key for the cart. 
     """
     return uuid.uuid4().hex[:32].lower() 
 
@@ -61,6 +49,13 @@ class CartItemModel(TimeStampModel):
     uid             = models.CharField(max_length=32, default=cart_item_unique_key,unique=True)
 
 
+    def save(self, *args, **kwargs):
+        """Calculate price based on product price and quantity."""
+        if not self.price:
+            self.price = self.product_id.price * self.quantity
+        super().save(*args, **kwargs)
+
+   
     def __str__(self) -> str:
         return f"Item {self.product_id.name} in Cart {self.cart_id.id}"
     
@@ -119,8 +114,16 @@ class OrderModel(TimeStampModel):
     
         super().save(*args, **kwargs)
 
+    def total_amount_calculation(self):
+        """
+        Calculate the total amount of the order based on the items in the cart.
+        """
+        total = sum(item.price * item.quantity for item in self.order_items.all())
+        self.total_amount = total
+        self.save()
+
     def __str__(self) -> str:
-        return f"Order {self.order_num} by {self.author.email} - Status: {self.ord_status}"
+        return f"{self.order_num}-{self.author.email}"
     
 
 

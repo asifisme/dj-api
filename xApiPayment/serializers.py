@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 
 from .models import PaymentModel 
+from xApiCart.models import OrderModel 
 
 
 class PaymentSerializer(serializers.ModelSerializer):
@@ -13,3 +14,22 @@ class PaymentSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('created', 'modified', 'order', 'user')
     
+
+class PaymentSerializerForPayment(serializers.ModelSerializer):
+    """ Serializer for PaymentModel for payment processing """
+    class Meta:
+        model = OrderModel 
+        fields = "__all__"
+        # read_only_fields = ('created', 'modified', 'order', 'user')
+
+
+class OrderPaymentProcessorSerializer(serializers.ModelSerializer):
+    """
+    Serializer for OrderModel
+    """
+    confirem  = serializers.BooleanField(default=False) 
+    
+    class Meta:
+        model = OrderModel 
+        fields = ['id', 'total_amount', 'confirem' ]
+        # fields = '__all__'

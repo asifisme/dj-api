@@ -1,5 +1,7 @@
 import stripe
 import logging
+from decouple import config
+
 
 from rest_framework.views import APIView
 from rest_framework.decorators import action
@@ -12,7 +14,7 @@ from rest_framework import  throttling
 
 
 from django.contrib.auth import get_user_model
-from decouple import config
+from django.shortcuts import get_object_or_404 
 
 
 from xApiCart.models import OrderModel 
@@ -20,7 +22,7 @@ from common.xpaymentprocessor import PaymentProcessor
 
 
 from .models import PaymentModel
-from .serializers import PaymentSerializer 
+from .serializers import OrderPaymentProcessorSerializer 
 
 stripe.api_key = config("STRIPE_TEST_SECRET_KEY")
 
@@ -30,9 +32,9 @@ logger = logging.getLogger(__name__)
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
-    queryset                = PaymentModel.objects.all()
-    serializer_class        = PaymentSerializer
-    permission_classes      = [permissions.IsAuthenticated]
+    queryset                = OrderModel.objects.all() 
+    serializer_class        = OrderPaymentProcessorSerializer
+    permission_classes      = [permissions.AllowAny]
     http_method_names       = ['get', 'post']
     throttle_classes        = [throttling.UserRateThrottle]
 
@@ -41,10 +43,10 @@ class PaymentViewSet(viewsets.ModelViewSet):
     def create_checkout_session(self, request):
         try:
             data = request.data
-            order_id = data.get('order_id')
+            order_id = data.get('id')
 
             if not order_id:
-                return Response({'error': 'order_id is required.'}, status=400)
+                return Response({'error': 'id is required.'}, status=400)
 
             try:
                 order = OrderModel.objects.get(id=order_id)
@@ -130,11 +132,26 @@ class StripeSuccessApiView(APIView):
                 email_of_payer=successfull_payer_data.get("customer_email"), 
             )
 
+            order_id = successfull_payer_data.get("order_id") 
+            # Update the order status 
+            try:
+                order = get_object_or_404(OrderModel, id=order_id) 
+                order.payment_status = "paid"
+                order.is_confirmed = True
+                order.ord_status = "completed"
+                order.shipping_status = "shipped" 
+                order.save()
 
+            except OrderModel.DoesNotExist:
+                logger.error("Order with ID %s not found.", order_id)
+                return Response({"error": "Order not found."}, status=404) 
+            
             return Response(successfull_payer_data, status=status.HTTP_200_OK)
+        
         except Exception as e:
             logger.error("Stripe session retrieve error: %s", str(e))
             return Response({"error": str(e)}, status=500)
+        
         except stripe.error.StripeError as e:
             logger.error("Stripe error: %s", str(e))
             return Response({"error": "Stripe error occurred."}, status=500)

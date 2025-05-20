@@ -1,9 +1,11 @@
 from django.contrib import admin
 
+
 from xApiCart.models import CartModel 
 from xApiCart.models import CartItemModel
 from xApiCart.models import OrderModel
 from xApiCart.models import OrderItemModel 
+
 
 
 @admin.register(CartModel)
@@ -16,6 +18,8 @@ class CartModelAdmin(admin.ModelAdmin):
     list_filter = ('created', 'modified')
     ordering = ('-created',) 
 
+
+
 @admin.register(CartItemModel)
 class CartItemModelAdmin(admin.ModelAdmin):
     """
@@ -26,15 +30,20 @@ class CartItemModelAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
     ordering = ('-created',) 
 
+
+
+
 @admin.register(OrderModel)
 class OrderModelAdmin(admin.ModelAdmin):
     """
     Admin interface for OrderModel.
     """
-    list_display = ('id', 'author', 'cart_id', 'created', 'modified', 'ord_status', 'total_amount')
+    list_display = ( 'order_num', 'total_amount', 'author', 'ord_status', 'is_confirmed', 'created', 'modified',  )
     search_fields = ('author__username',)
     list_filter = ('ord_status',)
     ordering = ('-created',) 
+
+
 
 
 @admin.register(OrderItemModel)

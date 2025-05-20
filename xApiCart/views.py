@@ -4,8 +4,9 @@ from rest_framework.response import Response
 from rest_framework import status 
 from rest_framework.exceptions import MethodNotAllowed 
 from rest_framework import throttling 
+from rest_framework.decorators import action 
 from django.shortcuts import get_object_or_404 
-
+from django.db import transaction 
 
 
 from .models import CartModel 
@@ -74,6 +75,62 @@ class CartModelViewSet(ModelViewSet):
             detail="Retrieve operation is not allowed for CartModelViewSet.",
             code=status.HTTP_405_METHOD_NOT_ALLOWED
         )
+    
+    # not allowing delete operation for cart items as per the original code logic 
+    @action(detail=False, methods=['get'], url_path='order-now')
+    def order_now(self, request):
+        """ Handle order now action. """
+        user = self.request.user 
+
+        cart = get_object_or_404(CartModel, author=user) 
+        cart_items = CartItemModel.objects.filter(cart_id=cart) 
+
+        if not cart_items.exists():
+            return Response({"message": "No items in the cart."}, status=status.HTTP_400_BAD_REQUEST) 
+        
+        with transaction.atomic():
+
+            order_data = OrderModel.objects.create(
+                author=user,
+                cart_id=cart, 
+            )
+
+            order_item = [
+                OrderItemModel(
+                    order_id = order_data, 
+                    product_id = item.product_id, 
+                    quantity = item.quantity,
+                    price = item.product_id.price * item.quantity,
+                ) for item in cart_items 
+            ]
+
+            OrderItemModel.objects.bulk_create(order_item)  # Use bulk_create for efficiency 
+            order_data.total_amount_calculation()  # Assuming this method exists in OrderModel to calculate total amount
+            order_data.save()  # Save the order data after bulk_create 
+
+
+        return Response({"message": "Order created successfully."}, status=status.HTTP_201_CREATED) 
+
+        # order_data = OrderModel.objects.create(
+        #     author=request.user,
+        #     cart_id=CartModel.objects.filter(author=request.user).first(), 
+        # )
+        # order_data.save() 
+
+        # cart_items = CartItemModel.objects.filter(cart_id=order_data.cart_id)
+        # order_items = []
+        # total_amount = 0
+        # for item in cart_items:
+        #     order_item = OrderItemModel.objects.create(
+        #         order_id=order_data,
+        #         product_id=item.product_id,
+        #         quantity=item.quantity,
+        #         price=item.price,
+        #     )
+            
+        #     order_item.save()  # Moved save() call outside the loop for efficiency
+
+        # return Response({"message": "Order now action executed."}, status=status.HTTP_200_OK)
 
   
 
