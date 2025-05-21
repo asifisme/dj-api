@@ -77,7 +77,7 @@ class ArticleImageViewSet(viewsets.ModelViewSet):
     serializer_class          = ArticleImageSerializer
     http_method_names         = ['get', 'post', 'put', 'delete'] 
     permission_classes        = [permissions.AllowAny]
-    parser_classes            = [throttling.UserRateThrottle]
+    throttle_classes          = [throttling.UserRateThrottle]
 #     lookup_field = 'uid'
     
     def perform_create(self, serializer):

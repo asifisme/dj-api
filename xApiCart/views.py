@@ -77,39 +77,39 @@ class CartModelViewSet(ModelViewSet):
         )
     
     # not allowing delete operation for cart items as per the original code logic 
-    @action(detail=False, methods=['get'], url_path='order-now')
-    def order_now(self, request):
-        """ Handle order now action. """
-        user = self.request.user 
+    # @action(detail=False, methods=['get'], url_path='order-now')
+    # def order_now(self, request):
+    #     """ Handle order now action. """
+    #     user = self.request.user 
 
-        cart = get_object_or_404(CartModel, author=user) 
-        cart_items = CartItemModel.objects.filter(cart_id=cart) 
+    #     cart = get_object_or_404(CartModel, author=user) 
+    #     cart_items = CartItemModel.objects.filter(cart_id=cart) 
 
-        if not cart_items.exists():
-            return Response({"message": "No items in the cart."}, status=status.HTTP_400_BAD_REQUEST) 
+    #     if not cart_items.exists():
+    #         return Response({"message": "No items in the cart."}, status=status.HTTP_400_BAD_REQUEST) 
         
-        with transaction.atomic():
+    #     with transaction.atomic():
 
-            order_data = OrderModel.objects.create(
-                author=user,
-                cart_id=cart, 
-            )
+    #         order_data = OrderModel.objects.create(
+    #             author=user,
+    #             cart_id=cart, 
+    #         )
 
-            order_item = [
-                OrderItemModel(
-                    order_id = order_data, 
-                    product_id = item.product_id, 
-                    quantity = item.quantity,
-                    price = item.product_id.price * item.quantity,
-                ) for item in cart_items 
-            ]
+    #         order_item = [
+    #             OrderItemModel(
+    #                 order_id = order_data, 
+    #                 product_id = item.product_id, 
+    #                 quantity = item.quantity,
+    #                 price = item.product_id.price * item.quantity,
+    #             ) for item in cart_items 
+    #         ]
 
-            OrderItemModel.objects.bulk_create(order_item)  # Use bulk_create for efficiency 
-            order_data.total_amount_calculation()  # Assuming this method exists in OrderModel to calculate total amount
-            order_data.save()  # Save the order data after bulk_create 
+    #         OrderItemModel.objects.bulk_create(order_item)  # Use bulk_create for efficiency 
+    #         order_data.total_amount_calculation()  # Assuming this method exists in OrderModel to calculate total amount
+    #         order_data.save()  # Save the order data after bulk_create 
 
 
-        return Response({"message": "Order created successfully."}, status=status.HTTP_201_CREATED) 
+    #     return Response({"message": "Order created successfully."}, status=status.HTTP_201_CREATED) 
 
         # order_data = OrderModel.objects.create(
         #     author=request.user,
@@ -163,6 +163,7 @@ class CartItemModelViewSet(ModelViewSet):
                 'price': product.price * quantity, 
             }
         )
+
 
         if not created:
            cart_item.quantity += quantity  # corrected variable name

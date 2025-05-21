@@ -115,12 +115,13 @@ class OrderModel(TimeStampModel):
         super().save(*args, **kwargs)
 
     def total_amount_calculation(self):
-        """
-        Calculate the total amount of the order based on the items in the cart.
-        """
-        total = sum(item.price * item.quantity for item in self.order_items.all())
-        self.total_amount = total
-        self.save()
+        total = 0
+        for item in self.order_items.all():
+            if item.product_id and item.product_id.price:
+                total += item.product_id.price * item.quantity
+            self.total_amount = total
+            self.save()
+
 
     def __str__(self) -> str:
         return f"{self.order_num}-{self.author.email}"
@@ -146,11 +147,11 @@ class OrderItemModel(TimeStampModel):
     uid                 = models.CharField(max_length=32, default=order_item_unique_key, unique=True) 
 
 
-    def save(self, *args, **kwargs):
-        """Calculate price based on product price and quantity."""
-        if not self.price:
-            self.price = self.product_id.price * self.quantity
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     """Calculate price based on product price and quantity."""
+    #     if not self.price:
+    #         self.price = self.product_id.price * self.quantity
+    #     super().save(*args, **kwargs)
 
 
     def __str__(self) -> str:

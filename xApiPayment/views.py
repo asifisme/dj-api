@@ -17,18 +17,77 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404 
 
 
+from xApiCart.models import CartModel
+from xApiCart.models import CartItemModel 
 from xApiCart.models import OrderModel 
+from xApiCart.models import OrderItemModel 
+
+
 from common.xpaymentprocessor import PaymentProcessor 
 
 
 from .models import PaymentModel
 from .serializers import OrderPaymentProcessorSerializer 
 
+
 stripe.api_key = config("STRIPE_TEST_SECRET_KEY")
+
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
-logger = logging.getLogger(__name__)
+
+class PaymentPreProssViewSet(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    http_method_names  = ['get', 'post']
+    throttle_classes   = [throttling.UserRateThrottle]
+
+
+    def post(self, request):
+        """ Calculate the total price of items in the cart. """ 
+        user = request.user 
+        if not user.is_authenticated:
+            return Response({"error": "User is not authenticated."}, status=status.HTTP_401_UNAUTHORIZED) 
+        
+        cart  = CartModel.objects.filter(author=user).first()  
+
+        if not cart:
+            return Response({"error": "Cart not found."}, status=status.HTTP_404_NOT_FOUND) 
+        
+        cart_items = CartItemModel.objects.filter(cart_id=cart) 
+
+        if not cart_items.exists():
+            return Response({'message' : 'No items in the cart.'}, status=status.HTTP_400_BAD_REQUEST) 
+        
+
+        order_data = OrderModel.objects.create(
+                author=user,
+                cart_id=cart, 
+            )
+        
+        order_data.save()
+
+        for item in cart_items:
+            order_item = OrderItemModel.objects.create(
+                order_id=order_data,
+                product_id=item.product_id,
+                quantity=item.quantity,
+                price=item.price,
+            )
+
+            order_item.save() 
+
+        # delete the all cart item 
+        cart_items.delete()
+
+        return Response({
+            'message': 'Order created successfully.',
+            'order_id': order_data.id,
+            'total_amount': order_data.total_amount,
+        }, status=status.HTTP_201_CREATED) 
+        
+
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -38,16 +97,26 @@ class PaymentViewSet(viewsets.ModelViewSet):
     http_method_names       = ['get', 'post']
     throttle_classes        = [throttling.UserRateThrottle]
 
-
+   
     @action(detail=False, methods=['post'], url_path='create-checkout-session')
     def create_checkout_session(self, request):
+
+        serializer = self.get_serializer(data=request.data) 
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+        
+        confirem = serializer.validated_data.get('confirem') 
+
+        if not confirem:
+            return Response({"error": "Please confirm the order."}, status=status.HTTP_400_BAD_REQUEST)
+
+
         try:
             data = request.data
             order_id = data.get('id')
 
             if not order_id:
                 return Response({'error': 'id is required.'}, status=400)
-
             try:
                 order = OrderModel.objects.get(id=order_id)
             except OrderModel.DoesNotExist:
