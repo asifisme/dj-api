@@ -1,0 +1,2 @@
+
+GLOBAL_EMAIL_SYSTEM = False 

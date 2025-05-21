@@ -105,9 +105,9 @@ class PaymentViewSet(viewsets.ModelViewSet):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
         
-        confirem = serializer.validated_data.get('confirem') 
+        confirm = serializer.validated_data.get('confirm') 
 
-        if not confirem:
+        if not confirm:
             return Response({"error": "Please confirm the order."}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -204,12 +204,14 @@ class StripeSuccessApiView(APIView):
             order_id = successfull_payer_data.get("order_id") 
             # Update the order status 
             try:
-                order = get_object_or_404(OrderModel, id=order_id) 
-                order.payment_status = "paid"
-                order.is_confirmed = True
-                order.ord_status = "completed"
-                order.shipping_status = "shipped" 
-                order.save()
+               order = get_object_or_404(OrderModel, id=successfull_payer_data.get("order_id"))
+               order.payment_status = "paid"
+               order.is_confirmed = True
+               order.ord_status = "completed"
+               order.shipping_status = "shipped"
+               order.save()
+
+               return Response(successfull_payer_data, status=status.HTTP_200_OK)
 
             except OrderModel.DoesNotExist:
                 logger.error("Order with ID %s not found.", order_id)

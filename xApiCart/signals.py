@@ -5,7 +5,6 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from .models import CartItemModel
 from .models import OrderItemModel
-from .models import CartModel 
 
 @receiver(pre_save, sender=CartItemModel)
 def update_cart_item_price(sender, instance, **kwargs):

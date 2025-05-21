@@ -27,9 +27,9 @@ class OrderPaymentProcessorSerializer(serializers.ModelSerializer):
     """
     Serializer for OrderModel
     """
-    confirem  = serializers.BooleanField(default=False) 
+    confirm  = serializers.BooleanField(default=False) 
     
     class Meta:
         model = OrderModel 
-        fields = ['id', 'total_amount', 'confirem' ]
+        fields = ['id', 'total_amount', 'confirm' ]
         # fields = '__all__'
