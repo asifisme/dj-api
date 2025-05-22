@@ -187,3 +187,4 @@ media/
 static/
 templates/
 assets/
+logs/ 

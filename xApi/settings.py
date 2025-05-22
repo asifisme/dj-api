@@ -1,6 +1,7 @@
 import os 
 import stripe 
 from datetime import timedelta 
+from datetime import datetime
 from decouple import config 
 
 from pathlib import Path
@@ -17,19 +18,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS =  config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
 
 # for payment gateway 
-
-# Replace with your Stripe test/live keys
-STRIPE_TEST_PUBLIC_KEY =  config('STRIPE_TEST_PUBLISHABLE_KEY')
-STRIPE_TEST_SECRET_KEY = config('STRIPE_TEST_SECRET_KEY')
-
-STRIPE_LIVE_MODE = False  # Change to True in production
-# DJSTRIPE_WEBHOOK_SECRET = "whsec_..."  # From Stripe webhook setup
-DJSTRIPE_USE_NATIVE_JSONFIELD = True
-
-# dj-stripe will use this secret key
-STRIPE_SECRET_KEY = STRIPE_TEST_SECRET_KEY
-DJSTRIPE_FOREIGN_KEY_TO_FIELD = "id"
-
+stripe.api_key = config('STRIPE_TEST_SECRET_KEY') 
 
 
 INSTALLED_APPS = [
@@ -50,6 +39,7 @@ INSTALLED_APPS = [
     'xApiCart',
     'xApiArticle',
     'xApiPayment', 
+    'xApiLedger', 
 ]
 
 
@@ -96,6 +86,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
+    'common.middleware.RequestCounterMiddleware',
+
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -185,3 +177,56 @@ EMAIL_USE_SSL = False
 EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+
+# For Logs 
+
+LOG_DIR = BASE_DIR / 'logs'
+LOG_DIR.mkdir(exist_ok=True)
+
+
+if not LOG_DIR.exists():
+    LOG_DIR.mkdir()
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {name} {message}',
+            'style': '{',
+        },
+    },
+
+    'handlers': {
+        'daily_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'server.log'),
+            'when': 'midnight',
+            'backupCount': 7,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+            'utc': True,
+        },
+    },
+
+    'loggers': {
+        'django.server': {
+            'handlers': ['daily_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'django.request': {
+            'handlers': ['daily_file'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+
+    'root': {
+        'handlers': ['daily_file'],
+        'level': 'INFO',
+    },
+}

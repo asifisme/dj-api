@@ -1,7 +1,6 @@
 import uuid 
 from django.db import models, transaction
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
 from xApiProduct.models import ProductModel
 
 from common.xtimestamp import TimeStampModel 
@@ -25,7 +24,7 @@ class CartModel(TimeStampModel):
 
 
     def __str__(self) -> str:
-        return f"Cart id : {self.id} author email :  {self.author.email}"
+        return f"Cart id : {self.id} {self.author.username}  "
     
 
 
@@ -103,6 +102,7 @@ class OrderModel(TimeStampModel):
     is_confirmed        = models.BooleanField(default=False)
     uid                 = models.CharField(max_length=32, default=order_unique_key, unique=True)      
 
+
     def save(self, *args, **kwargs):
         """start order number from 1000000000"""
         if not self.order_num:
@@ -114,6 +114,7 @@ class OrderModel(TimeStampModel):
     
         super().save(*args, **kwargs)
 
+
     def total_amount_calculation(self):
         total = 0
         for item in self.order_items.all():
@@ -123,8 +124,10 @@ class OrderModel(TimeStampModel):
             self.save()
 
 
+
     def __str__(self) -> str:
-        return f"{self.order_num}-{self.author.email}"
+        """order number and first product name"""
+        return f"{self.order_num}-{self.order_items.first().product_id.name if self.order_items.exists() else 'No Products'}" 
     
 
 

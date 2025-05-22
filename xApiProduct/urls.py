@@ -1,12 +1,14 @@
 from django.urls import path, include 
 from rest_framework.routers import DefaultRouter 
 
-from xApiProduct.views import ProductCategoryViewSet 
-from xApiProduct.views import ProductMetaTagViewSet
-from xApiProduct.views import ProductViewSet
-from xApiProduct.views import ProductImageViewSet 
-from xApiProduct.views import TopSellingProductViewSet 
-from xApiProduct.views import NewArrivalProductViewSet 
+from .views import ProductCategoryViewSet 
+from .views import ProductMetaTagViewSet
+from .views import ProductViewSet
+from .views import ProductImageViewSet 
+from .views import TopSellingProductViewSet 
+from .views import NewArrivalProductViewSet 
+
+
 
 router = DefaultRouter() 
 

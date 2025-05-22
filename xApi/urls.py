@@ -35,6 +35,7 @@ urlpatterns = api_dcoumentaion_urls + [
     path(API_URL, include('xApiCart.urls')),
     path(API_URL, include('xApiArticle.urls')),
     path(API_URL, include('xApiPayment.urls')), 
+    path(API_URL, include('xApiLedger.urls')), 
 ]
 
 

@@ -1,3 +1,4 @@
+import logging 
 from rest_framework import viewsets 
 from rest_framework.response import Response
 from rest_framework import status 
@@ -21,6 +22,7 @@ from .serializers import ProductImageSerializer
 from common.xpagepagination import DynamicPagination
 
 
+logger = logging.getLogger(__name__) 
 
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
@@ -33,6 +35,7 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     http_method_names      = ['get', 'post', 'put', 'delete']
     pagination_class       = DynamicPagination
     throttle_classes       = [throttling.UserRateThrottle]
+
 
 
 
@@ -110,3 +113,4 @@ class ProductImageViewSet(viewsets.ModelViewSet):
     http_method_names       = ['get', 'post', 'put', 'delete'] 
     pagination_class        = DynamicPagination 
     throttle_classes        = [throttling.UserRateThrottle]
+
