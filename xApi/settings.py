@@ -1,7 +1,7 @@
 import os 
 import stripe 
+import logging 
 from datetime import timedelta 
-from datetime import datetime
 from decouple import config 
 
 from pathlib import Path
@@ -121,13 +121,15 @@ WSGI_APPLICATION = 'xApi.wsgi.application'
 
 
 
-
+# for any cloude database 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -179,14 +181,21 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 
-# For Logs 
+# For server Logs 
 
 LOG_DIR = BASE_DIR / 'logs'
-LOG_DIR.mkdir(exist_ok=True)
-
-
 if not LOG_DIR.exists():
-    LOG_DIR.mkdir()
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+log_files = [
+    'server.log', 'request.log', 'security.log',
+    'access.log', 'error.log'
+]
+for log_file in log_files:
+    log_path = LOG_DIR / log_file
+    if not log_path.exists():
+        log_path.touch()
+
 
 LOGGING = {
     'version': 1,
@@ -197,10 +206,14 @@ LOGGING = {
             'format': '{levelname} {asctime} {name} {message}',
             'style': '{',
         },
+        'simple': {
+            'format': '[{asctime}] {levelname} {message}',
+            'style': '{',
+        },
     },
 
     'handlers': {
-        'daily_file': {
+        'server_file': {
             'level': 'INFO',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': os.path.join(LOG_DIR, 'server.log'),
@@ -208,25 +221,72 @@ LOGGING = {
             'backupCount': 7,
             'formatter': 'verbose',
             'encoding': 'utf-8',
-            'utc': True,
         },
+        'request_file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'request.log'),
+            'when': 'midnight',
+            'backupCount': 7,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
+        'security_file': {
+            'level': 'WARNING',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'security.log'),
+            'when': 'midnight',
+            'backupCount': 7,
+            'formatter': 'verbose',
+            'encoding': 'utf-8',
+        },
+         'file_access': {
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'access.log'),
+            'when': 'midnight',
+            'backupCount': 30,
+            'formatter': 'verbose',
+        },
+        'file_error': {
+            'level': 'ERROR', 
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(LOG_DIR, 'error.log'),
+            'when': 'midnight',
+            'backupCount': 30,
+            'formatter': 'verbose',
+        }
     },
 
     'loggers': {
-        'django.server': {
-            'handlers': ['daily_file'],
+        'django': {
+            'handlers': ['server_file'],
             'level': 'INFO',
             'propagate': False,
         },
         'django.request': {
-            'handlers': ['daily_file'],
+            'handlers': ['request_file'],
             'level': 'INFO',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['security_file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['file_access'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+        'django.error': {
+            'handlers': ['file_error'],
+            'level': 'ERROR',
             'propagate': False,
         },
     },
 
     'root': {
-        'handlers': ['daily_file'],
+        'handlers': ['server_file'],
         'level': 'INFO',
     },
 }
