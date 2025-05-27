@@ -63,7 +63,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes  = [permissions.IsAuthenticatedOrReadOnly]
     http_method_names   = ['get', 'post', 'put', 'delete']  
     filter_backends     = [filters.SearchFilter]
-    search_fields       = ['slug', 'title', 'name', 'desc', 'uid' ]
+    search_fields       = ['slug', 'title', 'name', 'description', 'uid' ]
     pagination_class    = DynamicPagination 
     throttle_classes    = [throttling.UserRateThrottle]
 
@@ -109,7 +109,7 @@ class ProductImageViewSet(viewsets.ModelViewSet):
     """
     queryset                = ProductImageModel.objects.all()
     serializer_class        = ProductImageSerializer
-    permission_classes      = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes      = [permissions.AllowAny]
     http_method_names       = ['get', 'post', 'put', 'delete'] 
     pagination_class        = DynamicPagination 
     throttle_classes        = [throttling.UserRateThrottle]

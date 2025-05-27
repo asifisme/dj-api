@@ -47,6 +47,9 @@ class CartItemModel(TimeStampModel):
     is_active       = models.BooleanField(default=True)
     uid             = models.CharField(max_length=32, default=cart_item_unique_key,unique=True)
 
+    class Meta:
+        ordering = ['-created']  
+
 
     def save(self, *args, **kwargs):
         """Calculate price based on product price and quantity."""
@@ -102,6 +105,9 @@ class OrderModel(TimeStampModel):
     is_confirmed        = models.BooleanField(default=False)
     uid                 = models.CharField(max_length=32, default=order_unique_key, unique=True)      
 
+    class Meta:
+        ordering = ['-created'] 
+
 
     def save(self, *args, **kwargs):
         """start order number from 1000000000"""
@@ -149,13 +155,8 @@ class OrderItemModel(TimeStampModel):
     price               = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     uid                 = models.CharField(max_length=32, default=order_item_unique_key, unique=True) 
 
-
-    # def save(self, *args, **kwargs):
-    #     """Calculate price based on product price and quantity."""
-    #     if not self.price:
-    #         self.price = self.product_id.price * self.quantity
-    #     super().save(*args, **kwargs)
-
+    class Meta:
+        ordering = ['-created'] 
 
     def __str__(self) -> str:
         return f"Item {self.product_id.name} in Order {self.order_id.id}"

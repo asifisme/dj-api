@@ -25,6 +25,9 @@ class PaymentModel(TimeStampModel):
     stripe_payment_method  = models.CharField(max_length=255, null=True, blank=True) 
     receipt_url            = models.URLField(null=True, blank=True)
 
+    class Meta:
+        ordering = ['-created'] 
+
 
     def __str__(self)-> str:
         return f"Payment for Order {self.order.id} by {self.user.username}" 

@@ -10,17 +10,10 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.exceptions import ValidationError 
 from django.contrib.auth import get_user_model 
 
+from common.xtimestamp import TimeStampModel 
 
 User = get_user_model()
 
-
-class TimeStampModel(models.Model):
-    created     = models.DateTimeField(auto_now_add=True)
-    modified   = models.DateTimeField(auto_now=True)
-
-
-    class Meta:
-        abstract = True 
 
 
 def generate_unique_uid():
@@ -38,8 +31,14 @@ class ArticleCategoryModel(TimeStampModel):
     uid             = models.CharField(max_length=32, default=generate_unique_uid, unique=True) 
 
 
+    class Meta:
+        ordering = ['-created'] 
+
+
     def __str__(self):
         return f'{self.cate_name}-written-by-{self.author.email if self.author else "unknown"}'
+    
+    
     
 
 
@@ -57,8 +56,13 @@ class ArticleMetaTag(TimeStampModel):
     uid            = models.CharField(max_length=32, default=generate_unique_uid, unique=True)
 
 
+    class Meta:
+        ordering = ['-created']  
+
+
     def __str__(self)-> str:
         return f'{self.tag}-{self.meta_title}' 
+    
 
 
 
@@ -84,6 +88,10 @@ class ArticleModel(TimeStampModel):
     uid                 = models.CharField(max_length=32, default=generate_unique_uid, unique=True)
 
 
+    class Meta:
+        ordering = ['-created'] 
+
+
     def save(self, *args, **kwargs):
         if not self.slug and self.title:
             self.slug = slugify(self.title) 
@@ -92,6 +100,8 @@ class ArticleModel(TimeStampModel):
 
     def __str__(self)-> str:
         return f'{self.title}'
+    
+
     
 
 
@@ -111,6 +121,10 @@ class ArticleImageModel(TimeStampModel):
     author              = models.ForeignKey(User, on_delete=models.PROTECT,  null=True, blank=True,  related_name='images') 
     image               = models.ImageField(upload_to=article_image_path, null=True, blank=True)
     uid                 = models.UUIDField(default=uuid.uuid4, unique=True)
+
+
+    class Meta:
+        ordering = ['-created'] 
 
     
     def __str__(self)-> str:

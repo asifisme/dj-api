@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from xApiProduct.models import ProductCategoryModel 
-from xApiProduct.models import ProductMetaTagModel
-from xApiProduct.models import ProductModel
-from xApiProduct.models import ProductImageModel 
+from .models import ProductCategoryModel 
+from .models import ProductMetaTagModel
+from .models import ProductModel
+from .models import ProductImageModel 
 
 @admin.register(ProductCategoryModel)
 class ProductCategoryAdmin(admin.ModelAdmin):
@@ -14,35 +14,30 @@ class ProductCategoryAdmin(admin.ModelAdmin):
     search_fields = ('cate_name', 'slug')
     prepopulated_fields = {'slug': ('cate_name',)}
     list_filter = ('author',)
-    ordering = ('-created',) 
 
 @admin.register(ProductMetaTagModel)
 class ProductMetaTagAdmin(admin.ModelAdmin):
     """
     Admin interface for ProductMetaTagModel
     """
-    list_display = ('id','tag', 'meta_title', 'meta_keywds', 'author', 'created', 'modified')
+    list_display = ('id','tag', 'meta_title', 'meta_keywds', 'created', 'modified')
     search_fields = ('tag', 'meta_title')
-    list_filter = ('author',)
-    ordering = ('-created',) 
 
 @admin.register(ProductModel)
 class ProductAdmin(admin.ModelAdmin):
     """
     Admin interface for ProductModel
     """
-    list_display = ('id','name', 'title', 'slug', 'price', 'author', 'created', 'modified')
-    search_fields = ('name', 'title', 'slug')
-    prepopulated_fields = {'slug': ('name',)}
-    list_filter = ('author',)
-    ordering = ('-created',) 
+    list_display = ('id', 'name', 'title', 'slug', 'price', 'stock', 'author', 'created', 'modified')
+    search_fields = ('name', 'title', 'slug', 'sku')
+    prepopulated_fields = {'slug': ('title',)}
 
+    
 
 @admin.register(ProductImageModel)
 class ProductImageAdmin(admin.ModelAdmin):
     """
     Admin interface for ProductImageModel
     """
-    list_display = ( 'image', 'created', 'modified')
-    search_fields = ('product__name',)
-    ordering = ('-created',)
+    list_display = ('product', 'product_image', 'created', 'modified')
+    search_fields = ('product__name', 'product__title', 'product__sku')

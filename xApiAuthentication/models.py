@@ -51,6 +51,10 @@ class CustomUser(AbstractUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name', 'username',]
 
 
+    class Meta:
+        ordering = ['-date_joined']
+ 
+
     def __str__(self):
         return f'{self.first_name} {self.last_name} - {self.email}'
 

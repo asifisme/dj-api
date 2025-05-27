@@ -184,7 +184,10 @@ media/
 *.html
 *.css
 *.js
-static/
+static/json
 templates/
 assets/
 logs/ 
+json/
+*.json
+*.json

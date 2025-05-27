@@ -85,9 +85,8 @@ class JournalEntryModel(TimeStampModel, ):
 
 
     class Meta:
-        verbose_name = "Journal Entry"
-        verbose_name_plural = "Journal Entries"
         ordering = ['-created']
+
 
     def __str__(self):
         return f"{self.ent_name or 'Unnamed Entry'} - {self.ent_num or 'No Entry Num'}"
