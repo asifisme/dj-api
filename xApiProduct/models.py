@@ -34,6 +34,9 @@ class ProductCategoryModel(TimeStampModel):
     author     = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
     uid        = models.CharField(max_length=255, default=product_categor_unique_key, unique=True)
 
+    class Meta:
+        ordering = ['-created']
+        
 
     def __str__(self) -> str:
         return self.cate_name or "Unnamed Category"

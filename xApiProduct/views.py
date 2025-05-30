@@ -109,7 +109,7 @@ class ProductImageViewSet(viewsets.ModelViewSet):
     """
     queryset                = ProductImageModel.objects.all()
     serializer_class        = ProductImageSerializer
-    permission_classes      = [permissions.AllowAny]
+    permission_classes      = [permissions.IsAuthenticatedOrReadOnly]
     http_method_names       = ['get', 'post', 'put', 'delete'] 
     pagination_class        = DynamicPagination 
     throttle_classes        = [throttling.UserRateThrottle]

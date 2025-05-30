@@ -21,6 +21,16 @@ ALLOWED_HOSTS =  config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',
 stripe.api_key = config('STRIPE_TEST_SECRET_KEY') 
 
 
+# if DEBUG:
+#     SECURE_SSL_REDIRECT = False
+#     SESSION_COOKIE_SECURE = False
+#     CSRF_COOKIE_SECURE = False
+# else:
+#     SECURE_SSL_REDIRECT = True
+#     SESSION_COOKIE_SECURE = True
+#     CSRF_COOKIE_SECURE = True
+
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -183,110 +193,110 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # For server Logs 
 
-LOG_DIR = BASE_DIR / 'logs'
-if not LOG_DIR.exists():
-    LOG_DIR.mkdir(parents=True, exist_ok=True)
+# LOG_DIR = BASE_DIR / 'logs'
+# if not LOG_DIR.exists():
+#     LOG_DIR.mkdir(parents=True, exist_ok=True)
 
-log_files = [
-    'server.log', 'request.log', 'security.log',
-    'access.log', 'error.log'
-]
-for log_file in log_files:
-    log_path = LOG_DIR / log_file
-    if not log_path.exists():
-        log_path.touch()
+# log_files = [
+#     'server.log', 'request.log', 'security.log',
+#     'access.log', 'error.log'
+# ]
+# for log_file in log_files:
+#     log_path = LOG_DIR / log_file
+#     if not log_path.exists():
+#         log_path.touch()
 
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
 
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {name} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '[{asctime}] {levelname} {message}',
-            'style': '{',
-        },
-    },
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {name} {message}',
+#             'style': '{',
+#         },
+#         'simple': {
+#             'format': '[{asctime}] {levelname} {message}',
+#             'style': '{',
+#         },
+#     },
 
-    'handlers': {
-        'server_file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': os.path.join(LOG_DIR, 'server.log'),
-            'when': 'midnight',
-            'backupCount': 7,
-            'formatter': 'verbose',
-            'encoding': 'utf-8',
-        },
-        'request_file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': os.path.join(LOG_DIR, 'request.log'),
-            'when': 'midnight',
-            'backupCount': 7,
-            'formatter': 'verbose',
-            'encoding': 'utf-8',
-        },
-        'security_file': {
-            'level': 'WARNING',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': os.path.join(LOG_DIR, 'security.log'),
-            'when': 'midnight',
-            'backupCount': 7,
-            'formatter': 'verbose',
-            'encoding': 'utf-8',
-        },
-         'file_access': {
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': os.path.join(LOG_DIR, 'access.log'),
-            'when': 'midnight',
-            'backupCount': 30,
-            'formatter': 'verbose',
-        },
-        'file_error': {
-            'level': 'ERROR', 
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'filename': os.path.join(LOG_DIR, 'error.log'),
-            'when': 'midnight',
-            'backupCount': 30,
-            'formatter': 'verbose',
-        }
-    },
+#     'handlers': {
+#         'server_file': {
+#             'level': 'INFO',
+#             'class': 'logging.handlers.TimedRotatingFileHandler',
+#             'filename': os.path.join(LOG_DIR, 'server.log'),
+#             'when': 'midnight',
+#             'backupCount': 7,
+#             'formatter': 'verbose',
+#             'encoding': 'utf-8',
+#         },
+#         'request_file': {
+#             'level': 'INFO',
+#             'class': 'logging.handlers.TimedRotatingFileHandler',
+#             'filename': os.path.join(LOG_DIR, 'request.log'),
+#             'when': 'midnight',
+#             'backupCount': 7,
+#             'formatter': 'verbose',
+#             'encoding': 'utf-8',
+#         },
+#         'security_file': {
+#             'level': 'WARNING',
+#             'class': 'logging.handlers.TimedRotatingFileHandler',
+#             'filename': os.path.join(LOG_DIR, 'security.log'),
+#             'when': 'midnight',
+#             'backupCount': 7,
+#             'formatter': 'verbose',
+#             'encoding': 'utf-8',
+#         },
+#          'file_access': {
+#             'class': 'logging.handlers.TimedRotatingFileHandler',
+#             'filename': os.path.join(LOG_DIR, 'access.log'),
+#             'when': 'midnight',
+#             'backupCount': 30,
+#             'formatter': 'verbose',
+#         },
+#         'file_error': {
+#             'level': 'ERROR', 
+#             'class': 'logging.handlers.TimedRotatingFileHandler',
+#             'filename': os.path.join(LOG_DIR, 'error.log'),
+#             'when': 'midnight',
+#             'backupCount': 30,
+#             'formatter': 'verbose',
+#         }
+#     },
 
-    'loggers': {
-        'django': {
-            'handlers': ['server_file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'django.request': {
-            'handlers': ['request_file'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'django.security': {
-            'handlers': ['security_file'],
-            'level': 'WARNING',
-            'propagate': False,
-        },
-        'django.db.backends': {
-            'handlers': ['file_access'],
-            'level': 'DEBUG',
-            'propagate': False,
-        },
-        'django.error': {
-            'handlers': ['file_error'],
-            'level': 'ERROR',
-            'propagate': False,
-        },
-    },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['server_file'],
+#             'level': 'INFO',
+#             'propagate': False,
+#         },
+#         'django.request': {
+#             'handlers': ['request_file'],
+#             'level': 'INFO',
+#             'propagate': False,
+#         },
+#         'django.security': {
+#             'handlers': ['security_file'],
+#             'level': 'WARNING',
+#             'propagate': False,
+#         },
+#         'django.db.backends': {
+#             'handlers': ['file_access'],
+#             'level': 'DEBUG',
+#             'propagate': False,
+#         },
+#         'django.error': {
+#             'handlers': ['file_error'],
+#             'level': 'ERROR',
+#             'propagate': False,
+#         },
+#     },
 
-    'root': {
-        'handlers': ['server_file'],
-        'level': 'INFO',
-    },
-}
+#     'root': {
+#         'handlers': ['server_file'],
+#         'level': 'INFO',
+#     },
+# }

@@ -9,5 +9,5 @@ class CustomUserAdmin(admin.ModelAdmin):
     """
     list_display = ('email', 'first_name', 'is_staff', 'is_active', 'date_joined')
     list_filter = ('is_staff', 'is_active')
-    search_fields = ('email', 'first_name',)
+    search_fields = ('id', 'email', 'first_name',)
     ordering = ('-date_joined',)

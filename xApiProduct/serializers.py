@@ -61,12 +61,13 @@ class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     class Meta:
         model = ProductModel
-        fields = [
-            'id', 'category', 'author', 'meta_tag', 'name', 'title', 'slug', 'description', 'weight', 'sku',
-            'price', 'discount_percent', 'stock', 'warranty_information', 'shipping_information', 'return_policy',
-            'min_order_quantity', 'unq_num', 'pro_uuid', 'is_available', 'is_approved', 'rating', 'views_count',
-            'sold_count', 'uid', 'images', 'created', 'modified'
-        ]
+        fields = '__all__' 
+        # fields = [
+        #     'id', 'category', 'author', 'meta_tag', 'name', 'title', 'slug', 'description', 'weight', 'sku',
+        #     'price', 'discount_percent', 'stock', 'warranty_information', 'shipping_information', 'return_policy',
+        #     'min_order_quantity', 'unq_num', 'pro_uuid', 'is_available', 'is_approved', 'rating', 'views_count',
+        #     'sold_count', 'uid', 'images', 'created', 'modified'
+        # ]
         read_only_fields = ['id', 'created', 'modified', 'unq_num', 'pro_uuid', 'uid', 'images']
 
 

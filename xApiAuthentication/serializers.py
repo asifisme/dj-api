@@ -31,13 +31,7 @@ class SingUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'username': 'Username already exists.'})
         return super().validate(attrs) 
     
-    # def vaildate_phn_num(self, attrs):
-    #     """ phone number validation """
-    #     if User.objects.filter(phn_num=attrs['phn_num']).exists():
-    #         raise serializers.ValidationError({'phn_num': 'Phone number already exists.'})
-    #     return super().validate(attrs)  
     
-
     def create(self, validated_data):
         validated_data.pop('confirm_password', None)
         password = validated_data.pop('password')
@@ -50,3 +44,39 @@ class SignInSerializer(serializers.Serializer):
     username_or_email   = serializers.CharField(required=True)
     password            = serializers.CharField(required=True, write_only=True)
     # remember_me        = serializers.BooleanField(default=False, required=False)
+
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True, write_only=True)
+    new_password = serializers.CharField(required=True, write_only=True)
+    confirm_password = serializers.CharField(required=True, write_only=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({'password': 'Password fields didn\'t match.'})
+        return attrs 
+
+
+class ResetPasswordRequestSerializer(serializers.Serializer):
+    username_or_email = serializers.CharField(required=True) 
+
+    def validate(self, attrs):
+        username_or_email = attrs.get('username_or_email')
+
+        if not username_or_email or not username_or_email.strip():
+            raise serializers.ValidationError('Username or email is required') 
+        
+        return attrs 
+    
+
+class ResetPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(required=True, write_only=True)
+    confirm_password = serializers.CharField(required=True, write_only=True)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({'password': 'Password fields didn\'t match.'})
+        return attrs
+
+
