@@ -10,7 +10,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.exceptions import ValidationError 
 from django.contrib.auth import get_user_model 
 
-from common.xtimestamp import TimeStampModel 
+from core.xtimestamp import TimeStampModel 
 
 User = get_user_model()
 
@@ -51,6 +51,7 @@ class ArticleMetaTag(TimeStampModel):
     tag            = models.CharField(max_length=255, null=True, blank=True)
     meta_title     = models.CharField(max_length=512, null=True, blank=True)
     meta_desc      = models.TextField(null=True, blank=True)
+    meta_keywords  = models.TextField(null=True, blank=True)
     meta_robots    = models.BooleanField(default=False) 
     is_active      = models.BooleanField(default=True)
     uid            = models.CharField(max_length=32, default=generate_unique_uid, unique=True)

@@ -7,7 +7,7 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth import get_user_model
 
-from common.xtimestamp import TimeStampModel
+from core.xtimestamp import TimeStampModel
 from xApiCart.models import OrderModel
 
 

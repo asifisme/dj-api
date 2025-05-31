@@ -20,8 +20,6 @@ class ProductCategorySerializer(serializers.ModelSerializer):
     def validate(self, attrs):
         if not attrs.get('cate_name') or not str(attrs.get('cate_name').strip()):
             raise serializers.ValidationError('Category is required')
-        # if not attrs.get('slug') or not str(attrs.get('slug').strip()):
-        #     raise serializers.ValidationError('Slug must required')
         return super().validate(attrs)
 
     

@@ -11,13 +11,15 @@ from PIL import UnidentifiedImageError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.exceptions import ValidationError
 
-from common.xtimestamp import TimeStampModel 
+from core.xtimestamp import TimeStampModel 
+
+
 
 User = get_user_model()
 
 
 
-def product_categor_unique_key()-> str:
+def product_categor_unique_key() -> str:
     """
     Generate a unique key for the product category.
     """

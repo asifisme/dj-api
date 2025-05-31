@@ -9,7 +9,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, PermissionsMixin
 from django.core.files.uploadedfile import InMemoryUploadedFile 
 
-from xApiAuthentication.managers import CustomUserManager
+from .managers import CustomUserManager
 
 
 def uload_to(instance, filename):

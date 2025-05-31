@@ -23,7 +23,7 @@ from xApiCart.models import OrderModel
 from xApiCart.models import OrderItemModel 
 
 
-from common.xpaymentprocessor import PaymentProcessor 
+from core.xpaymentprocessor import PaymentProcessor 
 
 
 from .models import PaymentModel

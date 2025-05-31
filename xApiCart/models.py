@@ -3,7 +3,7 @@ from django.db import models, transaction
 from django.contrib.auth import get_user_model
 from xApiProduct.models import ProductModel
 
-from common.xtimestamp import TimeStampModel 
+from core.xtimestamp import TimeStampModel 
 
 User = get_user_model()
 
