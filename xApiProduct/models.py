@@ -146,7 +146,6 @@ class ProductModel(TimeStampModel):
     views_count          = models.PositiveIntegerField(default=0)
     sold_count           = models.PositiveIntegerField(default=0) 
 
-    
     uid                  = models.CharField(max_length=255, default=product_unique_key, unique=True)
 
 
