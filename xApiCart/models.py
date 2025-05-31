@@ -1,6 +1,9 @@
 import uuid 
 from django.db import models, transaction
 from django.contrib.auth import get_user_model
+from decimal import Decimal 
+
+
 from xApiProduct.models import ProductModel
 
 from core.xtimestamp import TimeStampModel 
@@ -22,6 +25,8 @@ class CartModel(TimeStampModel):
     author          = models.OneToOneField(User,on_delete=models.CASCADE,related_name='carts')
     uid             = models.CharField(max_length=32, default=cart_unique_key,unique=True ) 
 
+    class Meta:
+        ordering = ['-created'] 
 
     def __str__(self) -> str:
         return f"Cart id : {self.id} {self.author.username}  "
@@ -49,14 +54,6 @@ class CartItemModel(TimeStampModel):
 
     class Meta:
         ordering = ['-created']  
-
-
-    def save(self, *args, **kwargs):
-        """Calculate price based on product price and quantity."""
-        if not self.price:
-            self.price = self.product_id.price * self.quantity
-        super().save(*args, **kwargs)
-
    
     def __str__(self) -> str:
         return f"Item {self.product_id.name} in Cart {self.cart_id.id}"
@@ -125,9 +122,9 @@ class OrderModel(TimeStampModel):
         total = 0
         for item in self.order_items.all():
             if item.product_id and item.product_id.price:
-                total += item.product_id.price * item.quantity
-            self.total_amount = total
-            self.save()
+                total += Decimal(item.product_id.price) * Decimal(item.quantity) * (Decimal('1.0') - (Decimal(str(item.product_id.discount_percent)) / Decimal('100')))
+        self.total_amount = total
+        self.save()
 
 
 
@@ -160,6 +157,6 @@ class OrderItemModel(TimeStampModel):
 
     def __str__(self) -> str:
         return f"Item {self.product_id.name} in Order {self.order_id.id}"
-    
+
 
 

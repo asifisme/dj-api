@@ -47,6 +47,27 @@ class IsOwnerStaffOrSuperUser(BasePermission):
          # Deny all other users
          return False 
       
+class CartItemIsOwnerStaffOrSuperUser(BasePermission):
+    """
+    Custom permission to only allow the owner, staff, or superuser to access the view.
+    """
+
+    def has_object_permission(self, request, view, obj):
+        # Superuser can do anything 
+        if request.user.is_authenticated and (request.user and request.user.is_superuser):
+            return True 
+        
+        # Staff can do only (GET) 
+        if request.user.is_authenticated and (request.user and request.user.is_staff):
+            return request.method in SAFE_METHODS
+        
+        # Owner can do anything 
+        if obj.cart_id.author == request.user:
+            return True
+        
+        # Deny all other users
+        return False
+  
 
 class IsSuperUser(BasePermission):
     """

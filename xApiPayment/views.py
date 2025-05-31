@@ -28,6 +28,7 @@ from core.xpaymentprocessor import PaymentProcessor
 
 from .models import PaymentModel
 from .serializers import OrderPaymentProcessorSerializer 
+from core.core_permissions import CartItemIsOwnerStaffOrSuperUser 
 
 
 stripe.api_key = config("STRIPE_TEST_SECRET_KEY")
@@ -39,7 +40,7 @@ User = get_user_model()
 
 
 class PaymentPreProssViewSet(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, CartItemIsOwnerStaffOrSuperUser]
     http_method_names  = ['get', 'post']
     throttle_classes   = [throttling.UserRateThrottle]
 
@@ -78,7 +79,7 @@ class PaymentPreProssViewSet(APIView):
 
             order_item.save() 
 
-        # delete the all cart item 
+        # delete all cart items 
         cart_items.delete()
 
         return Response({
@@ -93,7 +94,7 @@ class PaymentPreProssViewSet(APIView):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset                = OrderModel.objects.all() 
     serializer_class        = OrderPaymentProcessorSerializer
-    permission_classes      = [permissions.AllowAny]
+    permission_classes      = [permissions.IsAuthenticated, CartItemIsOwnerStaffOrSuperUser]
     http_method_names       = ['get', 'post']
     throttle_classes        = [throttling.UserRateThrottle]
 

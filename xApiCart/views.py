@@ -4,8 +4,12 @@ from rest_framework.response import Response
 from rest_framework import status 
 from rest_framework.exceptions import MethodNotAllowed 
 from rest_framework import throttling 
+from rest_framework import filters 
+
+
 from rest_framework.decorators import action 
 from django.shortcuts import get_object_or_404 
+from decimal import Decimal 
 
 
 from .models import CartModel 
@@ -19,6 +23,9 @@ from .serializers import OrderModelSerializer
 from .serializers import OrderItemModelSerializer 
 
 from xApiProduct.models import ProductModel 
+from core.xpagepagination import DynamicPagination 
+from core.core_permissions import IsOwnerStaffOrSuperUser
+from core.core_permissions import CartItemIsOwnerStaffOrSuperUser
 
 
 class CartModelViewSet(ModelViewSet):
@@ -27,9 +34,22 @@ class CartModelViewSet(ModelViewSet):
     """
     queryset                = CartModel.objects.all()
     serializer_class        = CartModelSerializer
-    permission_classes      = [permissions.IsAuthenticated]
-    http_method_names       = ['get', 'post', 'delete'] 
+    permission_classes      = [permissions.IsAuthenticated, IsOwnerStaffOrSuperUser] 
+    filter_backends         = [filters.SearchFilter, filters.OrderingFilter] 
+    search_fields          = ['uid', 'author__username']  # allow searching by uid and author's username 
+    http_method_names       = ['get', 'post'] 
     throttle_classes        = [throttling.UserRateThrottle]
+    pagination_class        = DynamicPagination  
+ 
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+        if user.is_superuser:
+            return qs # if user is superuser, return all carts 
+        if user.is_staff:
+            return qs  # if user is staff, return all carts 
+        return qs.filter(author=user) # if user is not superuser or staff, return only user's carts
 
 
     def create(self, request, *args, **kwargs):
@@ -63,15 +83,12 @@ class CartModelViewSet(ModelViewSet):
             code=status.HTTP_405_METHOD_NOT_ALLOWED
         )
     
-
-    
-    # not allowing update operation for cart items as per the original code logic 
-    def retrieve(self, request, *args, **kwargs):
-        """ Override retrieve method to prevent it from being used.
+    def destroy(self, request, *args, **kwargs):
+        """ Override destroy method to prevent it from being used.
         """
         raise MethodNotAllowed(
-            'GET', 
-            detail="Retrieve operation is not allowed for CartModelViewSet.",
+            'DELETE', 
+            detail="Delete operation is not allowed for CartModelViewSet.",
             code=status.HTTP_405_METHOD_NOT_ALLOWED
         )
     
@@ -85,9 +102,22 @@ class CartItemModelViewSet(ModelViewSet):
     """
     queryset                = CartItemModel.objects.all()
     serializer_class        = CartItemModelSerializer
-    permission_classes      = [permissions.AllowAny]
+    permission_classes      = [permissions.IsAuthenticated, CartItemIsOwnerStaffOrSuperUser]
+    filter_backends        = [filters.SearchFilter, filters.OrderingFilter] 
+    settings_fields          = ['product_id__uid', 'cart_id__author__username']   
     http_method_names       = ['get', 'post', 'put', 'delete'] 
     throttle_classes        = [throttling.UserRateThrottle]
+
+    def get_queryset(self):
+        user = self.request.user 
+
+        if not user.is_authenticated:
+            return CartItemModel.objects.none()
+
+        if user.is_superuser or user.is_staff:
+            return CartItemModel.objects.all() 
+        
+        return CartItemModel.objects.filter(cart_id__author=user)  # filter by user's cart 
 
 
     def create(self, request, *args, **kwargs):
@@ -101,32 +131,19 @@ class CartItemModelViewSet(ModelViewSet):
         cart_item, created = CartItemModel.objects.get_or_create(
             cart_id = cart, 
             product_id = product, 
-            defaults={
-                'quantity' : quantity,
-                'price': product.price * quantity, 
-            }
+
+            defaults={'quantity': quantity}
         )
 
 
         if not created:
-           cart_item.quantity += quantity  # corrected variable name
-           cart_item.price = product.price * cart_item.quantity  
+           cart_item.quantity += quantity   
            cart_item.save()
         serializer = self.get_serializer(cart_item)
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     
-    def update(self, request, *args, **kwargs):
-        """ Update an existing cart item. """
-        cart_item = get_object_or_404(CartItemModel, pk=kwargs['pk'])
-        quantity = int(request.data.get('quantity', cart_item.quantity))
-        cart_item.quantity = quantity
-        cart_item.price = cart_item.product.price * quantity
-        cart_item.save()
-        serializer = self.get_serializer(cart_item)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
+    
 
 
 
@@ -136,9 +153,24 @@ class OrderModelViewSet(ModelViewSet):
     """
     queryset                = OrderModel.objects.all()
     serializer_class        = OrderModelSerializer
-    permission_classes      = [permissions.IsAuthenticated]
+    permission_classes      = [permissions.IsAuthenticated, IsOwnerStaffOrSuperUser]
+    filter_backends         = [filters.SearchFilter, filters.OrderingFilter] 
+    search_fields          = ['uid', 'author__username']   
     http_method_names       = ['get', 'post', 'put', 'delete'] 
     throttle_classes        = [throttling.UserRateThrottle]
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+        if user.is_superuser:
+            return qs
+        if user.is_staff:
+            return qs
+        return qs.filter(author=user)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user) 
+        return super().perform_create(serializer)
 
 
     def update(self, request, *args, **kwargs):
@@ -158,6 +190,17 @@ class OrderItemModelViewSet(ModelViewSet):
     """
     queryset            = OrderItemModel.objects.all()
     serializer_class    = OrderItemModelSerializer
-    permission_classes  = [permissions.IsAuthenticated]
+    permission_classes  = [permissions.IsAuthenticated, IsOwnerStaffOrSuperUser]
+    filter_backends     = [filters.SearchFilter, filters.OrderingFilter] 
+    search_fields       = ['product_id__uid', 'order_id__author__username']   
     http_method_names   = ['get', 'post', 'put', 'delete']
     throttle_classes    = [throttling.UserRateThrottle]
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = super().get_queryset()
+        if user.is_superuser:
+            return qs
+        if user.is_staff:
+            return qs
+        return qs.filter(order_id__author=user)  # filter by user's orders
