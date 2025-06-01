@@ -30,12 +30,12 @@ API_URL = 'api/v1/'
 
 
 urlpatterns = api_dcoumentaion_urls + [
-    path(API_URL, include('xApiAuthentication.urls')),
-    path(API_URL, include('xApiProduct.urls')),
-    path(API_URL, include('xApiCart.urls')),
-    path(API_URL, include('xApiArticle.urls')),
-    path(API_URL, include('xApiPayment.urls')), 
-    path(API_URL, include('xApiLedger.urls')), 
+    path(API_URL, include('Authentication.urls')),
+    path(API_URL, include('Product.urls')),
+    path(API_URL, include('Cart.urls')),
+    path(API_URL, include('Article.urls')),
+    path(API_URL, include('Payment.urls')), 
+    path(API_URL, include('Ledger.urls')), 
 ]
 
 
