@@ -8,6 +8,9 @@ from Product.models import ProductModel
 
 from core.timestamp import TimeStampModel 
 
+
+
+
 class TimeStampModel(models.Model):
     """
     Abstract base model that provides created and modified timestamps.
@@ -19,6 +22,8 @@ class TimeStampModel(models.Model):
         abstract = True 
 
 User = get_user_model()
+
+
 
 
 def cart_unique_key() -> str:
@@ -144,7 +149,7 @@ class OrderModel(TimeStampModel):
     
 
 
-    
+
 def order_item_unique_key() -> str:
     """
     Generate a unique key for the order item.

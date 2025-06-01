@@ -31,7 +31,6 @@ class SingUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'username': 'Username already exists.'})
         return super().validate(attrs) 
     
-    
     def create(self, validated_data):
         validated_data.pop('confirm_password', None)
         password = validated_data.pop('password')
@@ -39,11 +38,14 @@ class SingUpSerializer(serializers.ModelSerializer):
         return user
     
 
+
+
 class SignInSerializer(serializers.Serializer):
     """ sign in serializer """
     username_or_email   = serializers.CharField(required=True)
     password            = serializers.CharField(required=True, write_only=True)
     # remember_me        = serializers.BooleanField(default=False, required=False)
+
 
 
 
@@ -56,6 +58,8 @@ class ChangePasswordSerializer(serializers.Serializer):
         if attrs['new_password'] != attrs['confirm_password']:
             raise serializers.ValidationError({'password': 'Password fields didn\'t match.'})
         return attrs 
+    
+
 
 
 class ResetPasswordRequestSerializer(serializers.Serializer):
@@ -69,6 +73,8 @@ class ResetPasswordRequestSerializer(serializers.Serializer):
         
         return attrs 
     
+
+
 
 class ResetPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(required=True, write_only=True)

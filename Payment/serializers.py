@@ -8,6 +8,7 @@ from Cart.models import OrderModel
 class PaymentSerializer(serializers.ModelSerializer):
     """
     Serializer for PaymentModel
+
     """
     class Meta:
         model = PaymentModel
@@ -31,5 +32,5 @@ class OrderPaymentProcessorSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = OrderModel 
-        fields = ['id', 'total_amount', 'confirm' ]
-        # fields = '__all__'
+        fields = ['confirm' ]
+        read_only_fields = ('created', 'modified', 'author', 'cart_id')

@@ -40,10 +40,12 @@ class OrderModelSerializer(serializers.ModelSerializer):
     """
     Serializer for OrderModel.
     """
+    
     class Meta:
         model = OrderModel
         fields = [ "id", "author", "cart_id", "order_num", "order_note", "ord_status", "total_amount", "payment_status", "shipping_status", "is_confirmed", "uid", "created", "modified"]
-        read_only_fields = [ "id", "author", "order_num", "order_note", "ord_status", "total_amount", "payment_status","shipping_status", "is_confirmed", "uid", "created", "modified"]
+        read_only_fields = [ "id", "author","cart_id", "order_num", "order_note", "ord_status", "total_amount", "payment_status","shipping_status", "uid", "created", "modified"]
+
 
 
 class OrderItemModelSerializer(serializers.ModelSerializer):
