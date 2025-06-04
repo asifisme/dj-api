@@ -2,6 +2,8 @@ import uuid
 from django.db import models, transaction
 from django.contrib.auth import get_user_model
 from decimal import Decimal 
+from django.core.exceptions import ValidationError 
+from django.core.validators import MinValueValidator
 
 
 from Product.models import ProductModel 
@@ -62,16 +64,26 @@ class CartItemModel(TimeStampModel):
     """
     cart_id         = models.ForeignKey(CartModel, on_delete=models.CASCADE, related_name='cart_items')
     product_id      = models.ForeignKey(ProductModel, on_delete=models.CASCADE, related_name='cart_items')
-    quantity        = models.PositiveIntegerField(default=1)
+    quantity        = models.PositiveIntegerField(default=1) 
     price           = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     is_active       = models.BooleanField(default=True)
     uid             = models.CharField(max_length=32, default=cart_item_unique_key,unique=True)
 
     class Meta:
         ordering = ['-created']  
+
+    def save(self, *args, **kwargs):
+        if self.quantity == 0:
+            if self.pk:
+                self.delete()
+            return
+        super().save(*args, **kwargs) 
+   
    
     def __str__(self) -> str:
         return f"Item {self.product_id.name} in Cart {self.cart_id.id}"
+    
+    
     
 
 

@@ -40,31 +40,16 @@ User = get_user_model()
 
 
 class PaymentViewSet(viewsets.ModelViewSet):
-    # This viewset handles payment-related actions for orders.
-    # It provides endpoints for creating Stripe checkout sessions and other payment operations.
-    #
-    # Response Message Industry Standard:
-    # -----------------------------------------------------------------------------
-    # All API responses should follow industry standards for clarity, consistency, and usability.
-    # - 200 OK: The request was successful. The response body contains the requested data or confirmation.
-    # - 201 Created: The request was successful and a new resource was created.
-    # - 400 Bad Request: The request could not be understood or was missing required parameters.
-    # - 401 Unauthorized: Authentication failed or user does not have permissions for the requested operation.
-    # - 403 Forbidden: Authentication succeeded but authenticated user does not have access to the resource.
-    # - 404 Not Found: The requested resource could not be found.
-    # - 500 Internal Server Error: An error occurred on the server.
-    #
-    # Each response should include a clear message and, if applicable, error details to help clients debug issues.
-    # For successful operations, include relevant data in the response body.
-    # For errors, provide a descriptive error message and use the appropriate HTTP status code.
-    #
-    # Example:
-    #   return Response({"message": "Order created successfully."}, status=status.HTTP_201_CREATED)
-    #   return Response({"error": "Order not found."}, status=status.HTTP_404_NOT_FOUND)
-    #
-    # This approach ensures that API consumers can reliably interpret and handle responses.
-    # -----------------------------------------------------------------------------
-
+    """ 
+    A viewset for handling payment-related operations.
+    This viewset allows authenticated users to create a Stripe checkout session
+    for their unpaid orders, confirming the order before proceeding to payment.
+    - Uses the `OrderPaymentProcessorSerializer` to validate input data.
+    - Ensures the user is authenticated and has an unpaid order.
+    - Creates a Stripe checkout session with the order details.
+    - Returns the checkout URL for the user to complete the payment.
+    - Handles errors gracefully, returning appropriate HTTP responses.
+    """     
     queryset = OrderModel.objects.all()
     serializer_class = OrderPaymentProcessorSerializer
     permission_classes = [permissions.IsAuthenticated, CartItemIsOwnerStaffOrSuperUser]

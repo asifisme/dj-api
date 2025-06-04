@@ -31,8 +31,16 @@ class CartItemModelSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CartItemModel
-        fields = ['id', 'cart_id', 'product_uid', 'quantity', 'price', 'is_active', 'uid', 'created', 'modified']
-        read_only_fields = ('id', 'cart_id', 'uid', 'price', 'created', 'modified') 
+        fields = ['id', 'cart_id', 'product_uid', 'quantity', 'product_id', 'price', 'is_active', 'uid', 'created', 'modified']
+        read_only_fields = ('id', 'cart_id', 'product_id', 'uid', 'price', 'created', 'modified') 
+
+    def validate_quantity(self, value):
+        """
+        Validate that the quantity is a positive integer.
+        """
+        if value < 0:
+            raise serializers.ValidationError("Quantity must be zero or positive.")
+        return value 
 
     
 

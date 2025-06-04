@@ -28,6 +28,8 @@ from core.core_permissions import IsOwnerStaffOrSuperUser
 from core.core_permissions import CartItemIsOwnerStaffOrSuperUser
 
 
+
+
 class CartModelViewSet(ModelViewSet):
     """
     ViewSet for CartModel.
@@ -150,29 +152,6 @@ class CartItemModelViewSet(ModelViewSet):
 
 
     def create(self, request, *args, **kwargs):
-
-        # This method creates a new cart item or updates the quantity of an existing one.
-        # It first retrieves or creates a cart for the user, then adds the specified product
-        # with the given quantity. If the product already exists in the cart, it increments
-        # the quantity instead of creating a new cart item.
-
-        # Parameters:
-        #     request (Request): The HTTP request object containing:
-        #         - product_uid (str): Unique identifier for the product
-        #         - quantity (int): Number of items to add (defaults to 1)
-        #     *args: Variable length argument list
-        #     **kwargs: Arbitrary keyword arguments
-
-        # Returns:
-        #     Response: JSON response containing:
-        #         - message (str): Success message indicating the operation result
-        #         - cart_item (dict): Serialized data of the created/updated cart item
-
-        # Raises:
-        #     Http404: If the specified product is not found
-
-        # Status Codes:
-        #     200: Successfully created or updated cart item
         """
         Handles POST requests to add a product to the user's cart.
         If the product already exists in the cart, increments the quantity.
@@ -180,30 +159,54 @@ class CartItemModelViewSet(ModelViewSet):
         """
         user = self.request.user
         product_uid = request.data.get('product_uid')
-        quantity = int(request.data.get('quantity', 1))
-        product = get_object_or_404(ProductModel, uid=product_uid)
 
+        delta = int(request.data.get('quantity', 1))
+
+        if delta == 0:
+            return Response({
+                "error": "Quantity must be greater than zero.",
+                "message": "Please provide a valid quantity to add to the cart."
+            }, status=status.HTTP_400_BAD_REQUEST) 
+
+
+        product = get_object_or_404(ProductModel, uid=product_uid)
         cart, _ = CartModel.objects.get_or_create(author=user)
 
-        cart_item, created = CartItemModel.objects.get_or_create(
-            cart_id=cart,
-            product_id=product,
-            defaults={'quantity': quantity}
-        )
-        if not created:
-            cart_item.quantity += quantity
-            cart_item.save()
-            message = "Cart item quantity updated successfully."
-        else:
-            message = "Cart item added successfully."
-        serializer = self.get_serializer(cart_item)
-        return Response({
-            "message": message,
-            "cart_item": serializer.data
-        }, status=status.HTTP_200_OK)
-    
-    
+        try:
+            cart_item = CartItemModel.objects.get(cart_id=cart, product_id=product)
+            new_quantity = cart_item.quantity + delta
 
+            if new_quantity < 1:
+                cart_item.delete()
+                return Response({
+                    "message": "Item removed from cart because quantity dropped to zero."
+                }, status=status.HTTP_200_OK)
+
+            cart_item.quantity = new_quantity
+            cart_item.save()
+            serializer = self.get_serializer(cart_item)
+            return Response({
+                "message": "Cart item quantity updated.",
+                "cart_item": serializer.data
+            }, status=status.HTTP_200_OK)
+        except CartItemModel.DoesNotExist:
+            if delta < 1:
+                return Response({
+                    "error": "Cannot reduce quantity below 1. Item not in cart."
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            cart_item = CartItemModel.objects.create(
+                cart_id=cart,
+                product_id=product,
+                quantity=delta
+            )
+            serializer = self.get_serializer(cart_item)
+            return Response({
+                "message": "Cart item added successfully.",
+                "cart_item": serializer.data
+            }, status=status.HTTP_201_CREATED)
+    
+    
 
 
 class OrderModelViewSet(ModelViewSet):
@@ -237,27 +240,14 @@ class OrderModelViewSet(ModelViewSet):
         return qs.filter(author=user)
     
     def create(self, request, *args, **kwargs):
-        # ------------------------------------------------------------------------------
-        # Complex Logic: Robust Order Creation with Multi-Step Validation and Cart Transfer
-        # ------------------------------------------------------------------------------
-        # This method orchestrates the creation of a new order for the authenticated user.
-        # It performs a series of critical business validations to ensure:
-        #   1. The user has explicitly confirmed their intent to place the order (prevents accidental orders).
-        #   2. The user does not have any previous incomplete orders (enforces one active order at a time).
-        #   3. The user has an active cart (cannot order without a cart).
-        #   4. The cart contains at least one item (prevents empty orders).
-        #
-        # If all checks pass, the method:
-        #   - Creates a new OrderModel instance linked to the user and their cart.
-        #   - Iterates through all cart items, transferring each to the new order as an OrderItemModel.
-        #   - Deletes all items from the cart to reflect that they are now part of the order.
-        #   - Returns a clear, structured API response with the new order's ID and total amount.
-        #
-        # This approach ensures data integrity, enforces business rules, and provides a seamless
-        # and predictable checkout experience for users. All error responses are meaningful and
-        # follow industry-standard API practices for clarity and usability.
-        # ------------------------------------------------------------------------------
-        # Get the current authenticated user
+        """ 
+        Handles POST requests to create a new order for the authenticated user.
+        - Checks if the user has confirmed the order to prevent accidental orders.
+        - Validates that the user has no existing incomplete orders.
+        - Ensures the user has an active cart with items before creating an order.
+        - Transfers items from the user's cart to the new order.
+        - Returns a structured response with order details upon successful creation.
+        """
         user = request.user
         # Check if the user has confirmed the order (prevents accidental orders)
         is_confirm = request.data.get('is_confirm', False)
@@ -328,28 +318,22 @@ class OrderModelViewSet(ModelViewSet):
         }, status=status.HTTP_201_CREATED)
 
     def perform_create(self, serializer):
-        # ------------------------------------------------------------------------------
-        # Helper Logic: Attach User and Cart to New Order
-        # ------------------------------------------------------------------------------
-        # This helper method is called by DRF's create method to ensure that every new order
-        # is associated with the current authenticated user and their active cart. This encapsulates
-        # the relationship logic, making the codebase more maintainable and reducing duplication.
-        # ------------------------------------------------------------------------------
-        # Attach the current user and their cart to the new order before saving
+        """ 
+        Custom save method for OrderModelViewSet.
+        - Automatically sets the author of the order to the current user.
+        - Associates the order with the user's active cart.
+        - Ensures the order is created with the correct author and cart association.
+        """
         user = self.request.user
         cart = CartModel.objects.filter(author=user).first()
         serializer.save(author=user, cart_id=cart)
         return super().perform_create(serializer)
 
     def update(self, request, *args, **kwargs):
-        # ------------------------------------------------------------------------------
-        # Business Rule Enforcement: Disable Order Updates
-        # ------------------------------------------------------------------------------
-        # This method disables the update operation for orders by always raising MethodNotAllowed.
-        # This enforces the business rule that orders, once created, cannot be modified via this endpoint.
-        # This preserves order integrity and prevents accidental or unauthorized changes.
-        # ------------------------------------------------------------------------------
-        # Always raise MethodNotAllowed to disable order updates via this endpoint
+        """
+        Disables the update operation for OrderModelViewSet by raising MethodNotAllowed.
+        This enforces business rules that orders cannot be updated via this endpoint.
+        """
         raise MethodNotAllowed(
             'PUT', 
             detail="Update operation is not allowed for OrderModelViewSet.",
