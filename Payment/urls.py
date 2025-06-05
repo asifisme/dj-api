@@ -15,5 +15,5 @@ urlpatterns = [
     path('', include(router.urls)),
     # path('payment-preprocessor/', PaymentPreProssViewSet.as_view(), name='payment-preprocessor'),
     path('stripe/success/', StripeSuccessApiView.as_view(), name='stripe-success'),
-    path('stripe/cancel/', StripeCancelApiView.as_view(), name='stripe-cancel'),
+    # path('stripe/cancel/', StripeCancelApiView.as_view(), name='stripe-cancel'),
 ]

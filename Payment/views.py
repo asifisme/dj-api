@@ -1,6 +1,7 @@
 import stripe
 import logging
 from decouple import config
+from django.shortcuts import redirect 
 
 
 from rest_framework.views import APIView
@@ -102,6 +103,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
             incomplate_order_items = OrderItemModel.objects.filter(order_id=order)
             order_id = order.id
 
+            # frontend_url = f"{frontend_url}api/v1/stripe/success/?session_id={{CHECKOUT_SESSION_ID}}" 
             success_url = f"{request.scheme}://{request.get_host()}/api/v1/stripe/success/?session_id={{CHECKOUT_SESSION_ID}}"
             cancel_url = f"{request.scheme}://{request.get_host()}/api/v1/stripe/cancel/"
 
@@ -149,6 +151,10 @@ class PaymentViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+
+
+
+
 class StripeCancelApiView(views.APIView):
     """
     API view to handle Stripe payment cancellation.
@@ -157,6 +163,8 @@ class StripeCancelApiView(views.APIView):
     def get(self, request):
         # 200 OK: Payment was cancelled by the user
         return Response({"message": "Payment was cancelled."}, status=status.HTTP_200_OK)
+    
+
     
 
 logger = logging.getLogger(__name__)
@@ -180,6 +188,7 @@ class StripeSuccessApiView(APIView):
         try:
             # Retrieve the Stripe session using the session_id
             session = stripe.checkout.Session.retrieve(session_id)
+
             session_data = session if isinstance(session, dict) else session.to_dict()
             successfull_payer_data = PaymentProcessor(session_data).get_payment_data()
 
@@ -210,7 +219,8 @@ class StripeSuccessApiView(APIView):
             order.save()
 
             # 200 OK: Payment processed successfully
-            return Response(successfull_payer_data, status=status.HTTP_200_OK)
+            return redirect(f"http://localhost:5173/orders")
+            # return Response(successfull_payer_data, status=status.HTTP_200_OK)
 
         except OrderModel.DoesNotExist:
             # 404 Not Found: Order not found

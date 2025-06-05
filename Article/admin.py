@@ -20,7 +20,7 @@ class ArticleCategoryAdmin(admin.ModelAdmin):
 
 @admin.register(ArticleMetaTag)
 class ArticleMetaTagAdmin(admin.ModelAdmin):
-    list_display = ('tag', 'meta_title', 'meta_desc', 'meta_robots', 'is_active', 'author', 'uid', 'created', 'modified')
+    list_display = ('tag', 'meta_title', 'meta_robots', 'is_active', 'author', 'uid', 'created', 'modified')
     search_fields = ('tag', 'meta_title', 'author__email')
     list_filter = ('is_active',)
     ordering = ('-created',) 

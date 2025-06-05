@@ -14,10 +14,7 @@ class ArticleCategorySerializer(serializers.ModelSerializer):
         model = ArticleCategoryModel
         fields = '__all__'
         read_only_fields = ('uid', 'created', 'modified')
-        # extra_kwargs = {
-        #     'author': {'required': False, 'allow_null': True}
-        # } 
-
+      
 
 
 
@@ -28,26 +25,7 @@ class ArticleMetaTagSerializer(serializers.ModelSerializer):
         model = ArticleMetaTag
         fields = '__all__'
         read_only_fields = ('uid', 'created', 'modified')
-        # extra_kwargs = {
-        #     'author': {'required': False, 'allow_null': True}
-        # } 
-
-
-
-
-class ArticleSerializer(serializers.ModelSerializer):
-    """ Serializer for Article Model """
-    
-    class Meta:
-        model = ArticleModel
-        fields = '__all__'
-        read_only_fields = ('uid', 'created', 'modified')
-        # extra_kwargs = {
-        #     'author': {'required': False, 'allow_null': True},
-        #     'cate_id': {'required': False, 'allow_null': True}
-        # } 
-
-
+     
 
 
 class ArticleImageSerializer(serializers.ModelSerializer):
@@ -55,9 +33,18 @@ class ArticleImageSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ArticleImageModel
+        fields = ['id', 'image', 'alt_text']
+    
+
+
+
+class ArticleSerializer(serializers.ModelSerializer):
+    """ Serializer for Article Model """
+
+    images = ArticleImageSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = ArticleModel
         fields = '__all__'
-        read_only_fields = ('uid', 'created', 'modified')
-        # extra_kwargs = {
-        #     'author': {'required': False, 'allow_null': True},
-        #     'article': {'required': False, 'allow_null': True}
-        # } 
+        read_only_fields = ('uid', 'images', 'created', 'modified')
+     

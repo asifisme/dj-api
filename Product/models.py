@@ -225,12 +225,12 @@ class ProductImageModel(TimeStampModel):
     Model for product images, storing original and thumbnail images.
     """
 
-    product = models.ForeignKey(ProductModel, on_delete=models.CASCADE, null=True, blank=True, related_name="images")
-    author = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
-    product_image = models.ImageField(upload_to=image_upload_to, null=True, blank=True)
-    unique_id = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    is_primary = models.BooleanField(default=False)
-    alt_text = models.CharField(max_length=255, null=True, blank=True, help_text="Alternative text for accessibility and SEO.")
+    product          = models.ForeignKey(ProductModel, on_delete=models.CASCADE, null=True, blank=True, related_name="images")
+    author           = models.ForeignKey(User, on_delete=models.PROTECT, null=True, blank=True)
+    product_image    = models.ImageField(upload_to=image_upload_to, null=True, blank=True)
+    unique_id        = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    is_primary       = models.BooleanField(default=False)
+    alt_text         = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         ordering = ['-created']
