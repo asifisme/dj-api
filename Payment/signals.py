@@ -8,6 +8,7 @@ from django.core.mail import send_mail
 from django.conf import settings 
 
 from .models import PaymentModel 
+from .models import PayPalPaymentModel 
 from Ledger.models import JournalEntryModel 
 
 logger = logging.getLogger(__name__)
@@ -99,3 +100,28 @@ def handle_payment_post_save(sender, instance, created, **kwargs):
             create_journal_entry(instance) 
 
         logger.info(f"Payment processed for order: {instance.order.id}")
+
+
+
+        
+
+@receiver(post_save, sender=PayPalPaymentModel)
+def handle_paypal_payment_post_save(sender, instance, created, **kwargs):
+    """
+    Signal for handling actions after PayPal payment creation.
+    """
+    if created:
+        if controller.GLOBAL_EMAIL_SYSTEM and instance.paypal_payment_id:
+            # Send payment confirmation email
+            send_payment_eamil(instance) 
+
+        if controller.GLOBAL_JOURNAL_SYSTEM and instance.paypal_payment_id:
+            # Create journal entry
+            create_journal_entry(instance) 
+            
+
+
+        logger.info(f"PayPal payment processed for order: {instance.order.id}")
+
+
+        

@@ -201,6 +201,23 @@ class ProductModel(TimeStampModel):
     
     def is_product_available(self) -> bool:
         return self.is_available and (self.stock is not None and self.stock > 0)
+    
+
+
+
+class WishListProduct(models.Model): 
+    """Model for wishlist products."""
+    user             = models.OneToOneField(User, on_delete=models.CASCADE) 
+    product          = models.ForeignKey(ProductModel, on_delete=models.CASCADE) 
+    added_at         = models.DateTimeField(auto_now_add=True) 
+
+    class Meta: 
+        ordering = ['-added_at']
+
+    def __str__(self) -> str:
+        return f"{self.user.username}'s wishlist - {self.product.name if self.product else 'No Product'}" 
+
+
 
 
 

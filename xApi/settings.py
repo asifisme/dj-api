@@ -20,6 +20,10 @@ ALLOWED_HOSTS =  config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',
 # for payment gateway 
 stripe.api_key = config('STRIPE_TEST_SECRET_KEY') 
 
+# for paypal payment gateway 
+PAYPAL_MODE = 'sandbox'
+PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID')
+PAYPAL_SECRET = config('PAYPAL_SECRET')
 
 # if DEBUG:
 #     SECURE_SSL_REDIRECT = False

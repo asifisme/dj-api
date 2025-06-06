@@ -23,13 +23,18 @@ class SingUpSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'password': 'Password fields didn\'t match.'})
         return super().validate(attrs)
     
-    def validate_username_and_email(self, attrs):
-        """ username and email validation """
-        if User.objects.filter(email=attrs['email']).exists():
+    def validate__email(self, value):
+        """ email validation """
+        if User.objects.filter(email=value).exists():
             raise serializers.ValidationError({'email': 'Email already exists.'})
-        if User.objects.filter(username=attrs['username']).exists():
+        return value 
+    
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
             raise serializers.ValidationError({'username': 'Username already exists.'})
-        return super().validate(attrs) 
+        return value
+    
+    
     
     def create(self, validated_data):
         validated_data.pop('confirm_password', None)

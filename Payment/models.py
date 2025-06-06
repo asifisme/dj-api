@@ -35,3 +35,24 @@ class PaymentModel(TimeStampModel):
 
 
 
+
+class PayPalPaymentModel(TimeStampModel):
+    """
+    Model to represent a PayPal payment
+    """
+    order                  = models.OneToOneField(OrderModel, on_delete=models.CASCADE, related_name='paypal_payment') 
+    user                   = models.ForeignKey(User, on_delete=models.CASCADE, related_name='paypal_payments') 
+    name_of_payer          = models.CharField(max_length=255, null=True, blank=True)
+    email_of_payer         = models.EmailField(null=True, blank=True)
+    amount_paid            = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    currency               = models.CharField(max_length=10, default="usd")
+    paypal_payment_id      = models.CharField(max_length=255, unique=True, null=True, blank=True) 
+    paypal_payer_id        = models.CharField(max_length=255, null=True, blank=True) 
+    paypal_token           = models.CharField(max_length=255, null=True, blank=True) 
+    paypal_payment_status  = models.CharField(max_length=50, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-created'] 
+
+    def __str__(self)-> str:
+        return f"PayPal Payment for Order {self.order.id} by {self.user.username}"

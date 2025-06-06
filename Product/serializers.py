@@ -4,6 +4,7 @@ from rest_framework import serializers
 from .models import ProductCategoryModel 
 from .models import ProductMetaTagModel
 from .models import ProductModel
+from .models import WishListProduct 
 from .models import ProductImageModel
 
 
@@ -52,6 +53,8 @@ class ProductImageSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created', 'modified']
 
 
+
+
 class ProductSerializer(serializers.ModelSerializer):
     """
     Serializer for products.
@@ -69,3 +72,31 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created', 'modified', 'unq_num', 'pro_uuid', 'uid', 'images']
 
 
+
+
+
+class WishListProductSerializer(serializers.ModelSerializer):
+    """
+    Serializer for wishlist products.
+    """
+    class Meta:
+        model = WishListProduct
+        fields = '__all__'
+        read_only_fields = ['id', 'added_at']
+    
+    def validate(self, attrs):
+        if not attrs.get('product'):
+            raise serializers.ValidationError('Product is required')
+        if not attrs.get('user'):
+            raise serializers.ValidationError('User is required')
+        return super().validate(attrs)
+    
+    def duplicate_product_check(self, attrs):
+        """
+        Check if the product is already in the user's wishlist.
+        """
+        user = attrs.get('user')
+        product = attrs.get('product')
+        if WishListProduct.objects.filter(user=user, product=product).exists():
+            raise serializers.ValidationError('This product is already in your wishlist.')
+        return attrs

@@ -3,6 +3,7 @@ from django.contrib import admin
 from .models import ProductCategoryModel 
 from .models import ProductMetaTagModel
 from .models import ProductModel
+from .models import WishListProduct 
 from .models import ProductImageModel 
 
 @admin.register(ProductCategoryModel)
@@ -31,6 +32,17 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'title', 'slug', 'price', 'stock', 'author', 'created', 'modified')
     search_fields = ('name', 'title', 'slug', 'sku')
     prepopulated_fields = {'slug': ('title',)}
+
+@admin.register(WishListProduct)
+class WishListProductAdmin(admin.ModelAdmin):
+    """
+    Admin interface for WishListProduct
+    """
+    list_display = ('id', 'product', 'user', 'added_at')
+    search_fields = ('product__name', 'product__title', 'user__username')
+    list_filter = ('user',) 
+
+
 
     
 

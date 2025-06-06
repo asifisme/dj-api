@@ -11,12 +11,14 @@ from rest_framework import throttling
 from .models import ProductCategoryModel
 from .models import ProductMetaTagModel
 from .models import ProductModel
+from .models import WishListProduct 
 from .models import ProductImageModel 
 
 
 from .serializers import ProductCategorySerializer
 from .serializers import ProductMetaTagSerializer
 from .serializers import ProductSerializer
+from .serializers import WishListProductSerializer 
 from .serializers import ProductImageSerializer 
 
 from core.pagepagination import DynamicPagination
@@ -109,6 +111,34 @@ class ProductViewSet(viewsets.ModelViewSet):
         if uid:
             return self.queryset.filter(uid=uid)
         
+        return super().get_queryset()
+
+
+
+
+class WishListProductViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for wishlist products.
+    """
+    queryset                = WishListProduct.objects.all()
+    serializer_class        = WishListProductSerializer
+    permission_classes      = [permissions.IsAuthenticatedOrReadOnly, IsOwnerStaffOrSuperUser]
+    http_method_names       = ['get', 'post', 'delete'] 
+    pagination_class        = DynamicPagination 
+    throttle_classes        = [throttling.UserRateThrottle]
+
+    def perform_create(self, serializer):
+        # check user authentication
+        if not self.request.user.is_authenticated:
+            return Response({"detail": "Authentication credentials were not provided."}, status=status.HTTP_401_UNAUTHORIZED)
+        serializer.save(user=self.request.user) 
+        return super().perform_create(serializer)
+    
+    def get_queryset(self):
+        """Override to customize the queryset."""
+        uid = self.request.query_params.get('q', None) 
+        if uid:
+            return self.queryset.filter(uid=uid) 
         return super().get_queryset()
 
 
