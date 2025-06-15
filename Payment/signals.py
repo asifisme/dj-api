@@ -1,4 +1,3 @@
-
 import controller 
 import logging 
 from decimal import Decimal
@@ -87,6 +86,8 @@ def send_payment_eamil(instance):
 
 @receiver(post_save, sender=PaymentModel)
 def handle_payment_post_save(sender, instance, created, **kwargs):
+    print("SIGNAL CALLED: PaymentModel post_save")
+    logger.info("SIGNAL CALLED: PaymentModel post_save")
     """
     Signal for handling actions after payment creation.
     """
@@ -95,7 +96,7 @@ def handle_payment_post_save(sender, instance, created, **kwargs):
             # Send payment confirmation email
             send_payment_eamil(instance) 
 
-        if controller.GLOBAL_JOURNAL_SYSTEM and instance.stripe_checkout_id:
+        if controller.GLOBAL_JOURNAL_SYSTEM and instance.stripe_checkout_id: 
             # Create journal entry
             create_journal_entry(instance) 
 
@@ -107,6 +108,8 @@ def handle_payment_post_save(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=PayPalPaymentModel)
 def handle_paypal_payment_post_save(sender, instance, created, **kwargs):
+    print("SIGNAL CALLED: PayPalPaymentModel post_save")
+    logger.info("SIGNAL CALLED: PayPalPaymentModel post_save")
     """
     Signal for handling actions after PayPal payment creation.
     """
@@ -124,4 +127,3 @@ def handle_paypal_payment_post_save(sender, instance, created, **kwargs):
         logger.info(f"PayPal payment processed for order: {instance.order.id}")
 
 
-        

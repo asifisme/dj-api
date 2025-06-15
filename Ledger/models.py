@@ -1,10 +1,7 @@
-
 import uuid
 import datetime
-import secrets 
 from decimal import Decimal 
 from django.db import models
-from django.utils import timezone
 from django.contrib.auth import get_user_model
 
 from core.timestamp import TimeStampModel
@@ -93,7 +90,7 @@ class JournalEntryModel(TimeStampModel, ):
 
     def save(self, *args, **kwargs):
         if not self.ended:
-            today = timezone.now().date()
+            today = datetime.datetime.now().date()
             next_month = today.replace(day=1, month=(today.month % 12) + 1, year=today.year + (1 if today.month == 12 else 0))
             self.ended = next_month - datetime.timedelta(days=1)
 
