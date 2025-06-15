@@ -86,7 +86,7 @@ def send_payment_eamil(instance):
 
 @receiver(post_save, sender=PaymentModel)
 def handle_payment_post_save(sender, instance, created, **kwargs):
-    print("SIGNAL CALLED: PaymentModel post_save")
+    # print("SIGNAL CALLED: PaymentModel post_save")
     logger.info("SIGNAL CALLED: PaymentModel post_save")
     """
     Signal for handling actions after payment creation.
@@ -108,7 +108,7 @@ def handle_payment_post_save(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=PayPalPaymentModel)
 def handle_paypal_payment_post_save(sender, instance, created, **kwargs):
-    print("SIGNAL CALLED: PayPalPaymentModel post_save")
+    # print("SIGNAL CALLED: PayPalPaymentModel post_save")
     logger.info("SIGNAL CALLED: PayPalPaymentModel post_save")
     """
     Signal for handling actions after PayPal payment creation.

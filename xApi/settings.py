@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
+    'channels',
     'corsheaders',
     'Authentication',
     'Product',
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     'Article',
     'Payment', 
     'Ledger', 
+    'Message', 
 ]
 
 
@@ -133,6 +135,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'xApi.wsgi.application'
 
+ASGI_APPLICATION = 'xApi.asgi.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channelS_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [(config('REDIS_HOST', default='localhost'), config('REDIS_PORT', default=6379, cast=int))],
+        },
+    },
+}
 
 
 # for any cloude database 

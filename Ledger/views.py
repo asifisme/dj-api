@@ -13,7 +13,7 @@ from .serializers import TrialBalanceSerializer
 
 
 class TrialBalanceViewSet(APIView):
-    # permission_classes = [permissions.IsAuthenticated, IsOwnerStaffOrSuperUser]  
+    permission_classes = [permissions.IsAuthenticated, IsOwnerStaffOrSuperUser]  
     serializer_class = TrialBalanceSerializer 
 
     def post(self, request, *args, **kwargs):
