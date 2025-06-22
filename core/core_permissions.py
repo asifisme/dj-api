@@ -41,12 +41,15 @@ class IsOwnerStaffOrSuperUser(BasePermission):
                return request.method in SAFE_METHODS
          
          # Owner can do anything 
-         if obj.author == request.user:
+         if obj == request.user:
                return True
          
          # Deny all other users
          return False 
-      
+
+
+
+
 class CartItemIsOwnerStaffOrSuperUser(BasePermission):
     """
     Custom permission to only allow the owner, staff, or superuser to access the view.
@@ -68,6 +71,8 @@ class CartItemIsOwnerStaffOrSuperUser(BasePermission):
         # Deny all other users
         return False
   
+
+
 
 class IsSuperUser(BasePermission):
     """
