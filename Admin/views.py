@@ -1,8 +1,8 @@
+import controller 
 from rest_framework import viewsets 
 from rest_framework import permissions 
 from rest_framework.response import Response 
 from rest_framework import status 
-from rest_framework import views 
 
 from django.contrib.auth import get_user_model 
 from django.core.mail import send_mail 
@@ -56,10 +56,11 @@ class SendMailViewSet(viewsets.ModelViewSet):
         to_email        = seriliser.validated_data['to_email'] 
 
         try:
-            send_mail(subject=subject, message=message, from_email=settings.DEFAULT_FROM_EMAIL, recipient_list=[to_email], fail_silently=False )
-            seriliser.save(
-                author=self.request.user,
-                status='sent')
+            if controller.GLOBAL_EMAIL_SYSTEM:
+                send_mail(subject=subject, message=message, from_email=settings.DEFAULT_FROM_EMAIL, recipient_list=[to_email], fail_silently=False )
+                seriliser.save(
+                    author=self.request.user,
+                    status='sent')
             return Response({"success": "Mail has been successfully send"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
