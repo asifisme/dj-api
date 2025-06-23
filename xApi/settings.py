@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'Payment', 
     'Ledger', 
     'Message', 
+    'Admin', 
 ]
 
 
@@ -181,6 +182,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+APPEND_SLASH = False
+
 
 AUTH_USER_MODEL = 'xApiAuthentication.CustomUser' 
 
