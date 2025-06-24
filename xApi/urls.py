@@ -38,6 +38,7 @@ urlpatterns = api_dcoumentaion_urls + [
     path(API_URL, include('Payment.urls')), 
     path(API_URL, include('Ledger.urls')), 
     path(API_URL, include('Message.urls')), 
+    path(API_URL, include('ChatBot.urls')), 
 ]
 
 

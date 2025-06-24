@@ -25,6 +25,10 @@ PAYPAL_MODE = 'sandbox'
 PAYPAL_CLIENT_ID = config('PAYPAL_CLIENT_ID')
 PAYPAL_SECRET = config('PAYPAL_SECRET')
 
+
+# Gemini Api key 
+GOOGLE_API_KEY = config('GEMINI_API_KEY')
+
 # if DEBUG:
 #     SECURE_SSL_REDIRECT = False
 #     SESSION_COOKIE_SECURE = False
@@ -58,6 +62,7 @@ INSTALLED_APPS = [
     'Ledger', 
     'Message', 
     'Admin', 
+    'ChatBot', 
 ]
 
 
